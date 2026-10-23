@@ -236,10 +236,6 @@ _PAGE_MULTI: Final = {"type": "array", "items": _PAGE_ITEM}
 _SINGLE_FIELDS: Final = tuple(f for f in TEXT_FIELDS if f is not FieldKey.sender)
 
 
-# Clockwise turn, in degrees, that makes a page upright as the model received it.
-ROTATIONS: Final = (0, 90, 180, 270)
-
-
 def page_schema(sender_options: Sequence[str]) -> dict[str, Any]:
     """Response schema of the whole-page read: one object per page sent, numbered from 1. The
     sender is an enumeration of the closed list plus SENDER_NOT_IN_LIST, so the model can pick
@@ -249,7 +245,6 @@ def page_schema(sender_options: Sequence[str]) -> dict[str, Any]:
         "properties": {
             "page": {"type": "integer"},
             "page_role": {"type": "string", "enum": list(PAGE_ROLES)},
-            "rotation": {"type": "integer"},  # one of ROTATIONS, checked by parse_page
             "sender": {"type": "string", "enum": [*sender_options, SENDER_NOT_IN_LIST]},
             "sender_box": _PAGE_BOX,
             "patient_address": {"type": "string"},
@@ -306,7 +301,6 @@ class _PageRead(Strict):
 
     page: int = Field(ge=1, le=50)
     page_role: str
-    rotation: int = 0
     sender: str = Field(max_length=VISION_TEXT_MAX)
     sender_box: list[float] = Field(default_factory=list, max_length=8)
     patient_address: str = Field(default="", max_length=VISION_TEXT_MAX)
@@ -359,8 +353,6 @@ def parse_page(text: str) -> PagePayload:
         raise ProviderBadResponse("response does not match the page schema") from exc
     if any(p.page_role not in PAGE_ROLES for p in payload.pages):
         raise ProviderBadResponse("page role outside the enumeration")
-    if any(p.rotation not in ROTATIONS for p in payload.pages):
-        raise ProviderBadResponse("rotation outside the enumeration")
     return payload
 
 
@@ -496,7 +488,6 @@ def page_answers(payload: PagePayload, pages_sent: int) -> list[PageAnswer]:
             seen[read.page] = PageAnswer(
                 page=read.page,
                 page_role=read.page_role,
-                rotation=read.rotation,
                 address=read.patient_address.strip(),
                 answers=_page_fields(read),
                 ambiguities=[a[:MAX_NOTE] for a in read.ambiguities[:MAX_AMBIGUITIES]],
