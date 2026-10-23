@@ -180,7 +180,6 @@ export interface OcrWord {
 export interface PageAnswer {
   page: number;
   page_role: string;
-  rotation?: number;
   address?: string;
   answers?: Partial<Record<FieldKey, VisionAnswer>>;
   ambiguities?: string[];
