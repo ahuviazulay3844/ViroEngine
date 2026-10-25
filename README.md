@@ -1,117 +1,344 @@
 # Safe Line · שורה בטוחה
 
-Turns Israeli medical commitment forms — scanned, photographed, rotated, handwritten — into
-validated spreadsheet rows. Wherever the engine is not certain it says so, explains why, and shows
-the exact pixels it read.
+**מנוע שהופך טפסי התחייבות רפואיים — סרוקים, מצולמים, הפוכים, בכתב יד — לשורות מאומתות בגיליון.
+כשהמנוע לא בטוח הוא אומר את זה, מסביר למה, ומראה בדיוק את הפיקסלים שקרא.**
 
-> Open Source AI Hackathon 2026 · Central Virology Laboratory challenge, Israeli Ministry of Health
-> Team: Ahuba, Shira
+> Open Source AI Hackathon 2026 · אתגר "מטפסי התחייבות לאקסל" של המעבדה המרכזית לנגיפים, משרד הבריאות
+> צוות: אהובה, שירה
 
-**Live demo:** _(link added in Task 28; access code in the submission description)_
+---
 
-<!-- Task 29 adds the recorded demo GIF here:
-![Demo](assets/demo.gif)
--->
+## תוכן עניינים
 
+1. [הבעיה](#1-הבעיה)
+2. [הפתרון בקצרה](#2-הפתרון-בקצרה)
+3. [מה המערכת מחלצת](#3-מה-המערכת-מחלצת)
+4. [חוויית המשתמש](#4-חוויית-המשתמש)
+5. [איך המנוע עובד](#5-איך-המנוע-עובד)
+6. [סולם הביטחון: ירוק, ענבר, כתום](#6-סולם-הביטחון-ירוק-ענבר-כתום)
+7. [עקרונות התכנון](#7-עקרונות-התכנון)
+8. [ארכיטקטורה](#8-ארכיטקטורה)
+9. [שכבת הלמידה](#9-שכבת-הלמידה)
+10. [פרטיות ואבטחה](#10-פרטיות-ואבטחה)
+11. [הערכה ומדדים](#11-הערכה-ומדדים)
+12. [טכנולוגיות](#12-טכנולוגיות)
+13. [הרצה ופריסה](#13-הרצה-ופריסה)
+14. [מבנה המאגר](#14-מבנה-המאגר)
+15. [מסמכים נוספים](#15-מסמכים-נוספים)
 
-## Results
+---
 
-_Measured on the 15 held-out pages, which were never used for calibration, rule writing or reader
-selection. Filled in Task 30 — a target is never published as an achievement._
+## 1. הבעיה
 
-| Metric | Result | Target |
+המעבדה המרכזית לנגיפים מקבלת מדי יום עשרות דגימות. לכל דגימה מצורף **טופס התחייבות** — המסמך
+שבו הגורם המממן (קופת חולים, בית חולים, מעבדה פרטית, צה"ל) מתחייב לשלם על הבדיקה.
+
+הטפסים מגיעים מ-4 קופות, יותר מ-20 בתי חולים, מעבדות פרטיות ושירותי רפואה צבאיים, ואין שניים
+שנראים אותו דבר: מודפסים, סרוקים, מצולמים בטלפון, הפוכים, בפקס, בכתב יד, או צילום מסך של מערכת
+SAP של בית חולים. לבורנטית מקלידה את כל זה ידנית לגיליון — **בערך שעה ל-30 טפסים**, עם טעויות
+שאף אחד לא שם לב אליהן.
+
+טעות כזו אינה קוסמטית: מספר מרכזי שגוי מצמיד תוצאת בדיקה **לדגימה של מטופל אחר**.
+
+## 2. הפתרון בקצרה
+
+גוררים ערימת טפסים למסך. תוך כמה דקות מתקבלת טבלה: רוב התאים ירוקים (אומתו), ומעטים כתומים
+(צריך עין אנושית). לחיצה על תא כתום מציגה את האזור המקורי בטופס, מוגדל, יחד עם הסיבה לספק
+ואפשרויות לבחירה. בסוף — ייצוא ל-Excel, CSV או JSON.
+
+העיקרון המנחה: **שדה ריק ומסומן עדיף על ניחוש.** המדד המוביל של הפרויקט הוא לא "אחוז דיוק" אלא
+**טעות שקטה** — ערך שגוי שהמערכת *לא* סימנה. מערכת שמדייקת ב-95% ומסמנת את כל טעויותיה בטוחה;
+מערכת שמדייקת ב-98% ומסתירה אותן מסוכנת.
+
+התרחיש שאליו מכוונים: 30 טפסים → כ-4 דקות → אפס ערכים שגויים שלא סומנו.
+
+## 3. מה המערכת מחלצת
+
+שבעה שדות מכל טופס, כל אחד עם ערך, מקור, מיקום בעמוד, מועמדים חלופיים, ציון ורמת ביטחון:
+
+| שדה | הערות |
+|---|---|
+| שם פרטי | בדוגמאות — בכתב יד; לעולם לא "מתקנים" איות |
+| שם משפחה | כנ"ל |
+| מספר תעודת זהות | מאומת בספרת ביקורת; אפסים מובילים מנורמלים |
+| מספר מרכזי | המספר הפנימי של המעבדה לדגימה. **יכולים להיות כמה** — כולם נשמרים |
+| תאריך קבלת הדגימה | מחותמת "התקבל" של המעבדה בלבד; תאריך לא קיים או עתידי נדחה |
+| גורם שולח | נבחר **מרשימה סגורה** של 37 מוסדות, או "לא ברשימה". לעולם לא מומצא, ולעולם לא היעד |
+| מספר התחייבות | פורמט שונה לכל מוסד (גם עם אותיות). **כמה התחייבויות = כמה שורות** |
+
+**מה המערכת לא קוראת, בכוונה:** תוכן קליני — אבחנה, בדיקה מבוקשת, הערות רופא. אזורים אלה לא
+נשלחים לשום ספק חיצוני.
+
+## 4. חוויית המשתמש
+
+ממשק בעברית, מימין לשמאל, בשישה מסכים:
+
+| מסך | מה קורה בו |
+|---|---|
+| **כניסה** | קוד גישה |
+| **העלאה** | גרירה של קובץ אחד או ערימה: PDF, PNG, JPG או ZIP |
+| **עיבוד** | התקדמות חיה לכל עמוד (Server-Sent Events) ומונים |
+| **סקירה** | הטבלה עצמה. כל תא צבוע לפי רמת הביטחון, עם אייקון וטקסט (לא רק צבע). לחיצה פותחת "עדשת ראיות": החיתוך המקורי מהעמוד, שרשרת הקריאות, הסיבה, ומועמדים לבחירה. עבודה מלאה מהמקלדת, ביטול פעולה, ויומן ביקורת לכל עריכה |
+| **ייצוא** | Excel עם צבעים והערות בתאים, CSV, JSON |
+| **לוח מדדים** | דיוק לפי שדה, טבלת ablation, עקומת למידה, עלות |
+
+בנוסף, **מצב לחץ**: מריץ מחדש את אותם טפסים אחרי השחתה מכוונת (סיבוב, טשטוש, הסרת סימון צהוב)
+כדי להראות שהמנוע ממשיך לעבוד ומסמן במקום לנחש.
+
+## 5. איך המנוע עובד
+
+**מודל ראייה קורא, קוד מחליט, אדם רק איפה שצריך** ([ADR-017](docs/decisions/ADR-017-vision-first.md)).
+
+```mermaid
+flowchart LR
+    U["העלאה"] --> I["קליטה<br/>פיצול לעמודים, יישור"]
+    I --> B["סריקת ברקודים<br/>מקומית, כל סוג ואורך"]
+    B --> R1["קריאה ראשונה<br/>מודל ראייה, סכמה קשיחה,<br/>רשימת שולחים סגורה"]
+    R1 --> R2["קריאה עיוורת שנייה<br/>מודל אחר, בלי לראות<br/>את התשובה הראשונה"]
+    R2 --> S["החלטה בקוד<br/>ספרת ביקורת, לוח שנה,<br/>הסכמה בין קוראים"]
+    S -- "מחלוקת" --> R3["קריאה שלישית<br/>חיתוך מוגדל"]
+    R3 --> S
+    S --> W["שורות<br/>שורה לכל התחייבות"]
+    W --> H["סקירה אנושית<br/>רק הכתומים"]
+    H --> X["ייצוא · למידה · מחיקה"]
+```
+
+1. **קליטה** — בדיקת סוג קובץ אמיתי (magic bytes), מגבלות גודל, פיצול PDF לעמודים, יישור עמודים
+   הפוכים.
+2. **סריקת ברקודים** (מקומית, כשנייה לעמוד) — כל ברקוד שנקרא הוא "קורא" עצמאי נוסף.
+3. **קריאה ראשונה** — העמוד כולו נשלח למודל ראייה (Gemini Flash) עם סכמת JSON קשיחה. הגורם השולח
+   מוגדר בסכמה כרשימה סגורה, כך שהמודל יכול *לבחור* מוסד אך לא *להמציא* אחד. הפרומפט מכיל את
+   הידע על הטפסים: שמות תוויות, מלכודות, היעד שאסור להחזיר, כלל חותמת הקבלה.
+4. **קריאה עיוורת שנייה** — מודל אחר קורא שוב, **בלי לראות את התשובה הראשונה**. שתי קריאות שמסכימות
+   הן שני עדים בלתי תלויים.
+5. **החלטה בקוד** — הקוד, לא המודל, קובע את רמת הביטחון (סעיף 6). במחלוקת נשלח חיתוך מוגדל לקריאה
+   שלישית; רוב של שניים מתוך שלושה מכריע, אחרת השדה נשאר כתום.
+6. **שורות** — קיבוץ עמודים לטפסים, שורה לכל מספר התחייבות, כל המספרים המרכזיים נשמרים.
+7. **סקירה, ייצוא, למידה ומחיקה** — אחרי אישור הלבורנטית המערכת לומדת *איפה* נמצאים השדות (סעיף 9),
+   וכל התמונות והערכים נמחקים אחרי 30 דקות.
+
+**חוסן:** אם ספק נופל או נגמרת מכסה, השרשרת עוברת למפתח הבא, למודל הבא, ולבסוף לספק אחר
+(OpenRouter, Groq). עמוד שאף מודל חזק לא קרא עובר ל**מסלול מקומי מלא** (Tesseract, ברקודים,
+TrOCR לספרות בכתב יד) ומסומן. ריצה לעולם לא נעצרת. כ-5–10 שניות לעמוד, עמודים במקביל.
+
+## 6. סולם הביטחון: ירוק, ענבר, כתום
+
+| רמה | מתי | תצוגה |
 |---|---|---|
-| Silent error (wrong **and** not flagged) | — | ≤ 1% |
-| Flag recall | — | ≥ 95% |
-| Printed-field accuracy | — | ≥ 98% |
-| Handwritten-field accuracy | — | ≥ 90% |
-| Closed locally, no cloud call | — | measured |
-| 30 forms end to end | — | < 4 min |
-| Development cost | $0 | $0 |
+| **A** | ברקוד וקריאה של הטקסט המודפס מסכימים, וכל הכללים הקשיחים עוברים | ירוק · `אומת בברקוד` ✓ |
+| **B** | שני קוראים בלתי תלויים מסכימים, וכל הכללים הקשיחים עוברים | ירוק · `שני קוראים הסכימו` ✓ |
+| **C** | קורא אחד, מקור מודפס, ציון גבוה | ענבר · `נקרא פעם אחת` ◐ |
+| **D** | כל השאר | כתום · `לא בטוח – בדקי` ⚠ + סיבה |
 
-See `eval/results/final_report.md` and [`docs/limitations.md`](docs/limitations.md).
+- שדות קריטיים (ת"ז, מספר מרכזי, תאריך, התחייבות) ירוקים **רק** ברמה A או B.
+- כל שדה כתום נושא סיבה **מרשימה סגורה**: "שני הקוראים לא הסכימו", "ספרת הביקורת של ת"ז לא
+  תקינה", "התאריך עתידי", "הגורם לא ברשימה הסגורה" ועוד.
+- **המודל לעולם לא מדווח על הביטחון של עצמו** — בסכמה אין שדה כזה. ביטחון נגזר רק מהסכמה בין
+  קוראים בלתי תלויים ומכללי אימות.
+- מספר שמופיע בשני שדות שונים (למשל גם כת"ז וגם כמספר מרכזי) מסמן את שניהם — ברקוד מוכיח את
+  הספרות, לא לאיזה שדה הן שייכות.
 
-## Run locally
+## 7. עקרונות התכנון
 
-```powershell
-cp .env.example .env            # fill in GEMINI_API_KEYS (https://aistudio.google.com/apikey)
-pip install -r requirements.txt
-cd frontend; npm ci; $env:VITE_API_BASE="/v1"; npx vite build; cd ..
-python -m uvicorn backend.app:app --port 8000     # web app + API on http://localhost:8000
-```
+| עיקרון | משמעות |
+|---|---|
+| **לעולם לא לנחש** | ערך שלא ניתן לאמת נשאר ריק ומסומן. ריק ≠ שגיאה |
+| **אין פורמטים קבועים** | שדה מזוהה לפי התווית שלידו, לא לפי אורך או צורה. בדוגמאות יש מספר התחייבות עם אות (`X132767`), אורכים 4–9, מספרים מרכזיים בלי ברקוד, ומעבדה בלי מספר התחייבות |
+| **רק תקנים אמיתיים פוסלים** | שני כללים קשיחים בלבד: ספרת ביקורת של ת"ז ישראלית, ותאריך שקיים בלוח השנה ואינו עתידי. כל השאר רק משפיע על הציון |
+| **הקוד מחליט, לא המודל** | כל תשובה של מודל עוברת אימות סכמה ואז נשקלת כמועמד נוסף |
+| **API קודם, Excel אחר כך** | Excel הוא מתאם ייצוא אחד. חיבור עתידי ל-SAP/LIMS של המעבדה הוא מתאם חדש, לא שכתוב |
+| **תצורה, לא קבועים** | כל סף ומזהה מודל נמצא ב-[config/models.yaml](config/models.yaml) או ב-`.env`, כדי שאפשר יהיה לכייל ולהחליף ספק בלי לגעת בקוד |
+| **דיווח כן** | יעד לעולם לא מוצג כהישג. כל מספר מגיע עם החלוקה והתאריך שבהם נמדד |
 
-Or `docker build -t safeline . && docker run -p 8000:8000 --env-file .env safeline`.
-Deploy to a free Hugging Face Space: [`docs/DEPLOY.md`](docs/DEPLOY.md) (one script).
+## 8. ארכיטקטורה
 
-## How it works
+**Hexagonal (Ports & Adapters).** ליבת המנוע — צינור העיבוד, הניקוד, האימות — היא Python טהור שלא
+מייבא אף framework או SDK של ספק. כל דבר חיצוני (OCR, ברקודים, מודלי ראייה, אחסון, ייצוא, למידה,
+שעון) נגיש דרך **port** (ממשק), ומומש ב-**adapter**. הכלל נאכף ב-CI על ידי
+[scripts/check_layering.py](scripts/check_layering.py).
 
-Vision model first, code decides, human only where needed ([ADR-017](docs/decisions/ADR-017-vision-first.md)):
-
-```
-barcode sweep (local)  →  page read: Gemini 3 Flash, strict schema, closed sender list
-   →  blind re-read of zoomed crops (the second reader never sees the first answer)
-   →  code: ID check digit · real date · barcode vs reading · one number never in two fields
-   →  A barcode-confirmed · B two readers agree · D orange, with the reason and the pixels
-```
-
-The model never reports its own confidence; agreement between independent readers and national
-validation rules do. A field that cannot be verified stays empty and flagged, never guessed. If no
-strong model answers (quota, outage) the page falls back to the local OCR cascade of PLAN §4 and
-is flagged, so a run never stops. About 5–10 s a page, pages read in parallel.
+למה זה חשוב כאן: ספקים חינמיים לא יציבים (מכסות משתנות, מודלים יוצאים משימוש), אז "Gemini נפל
+היום" צריך להיות שינוי תצורה ולא שינוי קוד; והמעבדה תרצה בסוף SAP ולא Excel.
 
 ![Architecture](assets/architecture.png)
 
-Full design: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) ·
-Complete plan: [`docs/PLAN.md`](docs/PLAN.md)
+| שכבה | אחריות | תיקייה |
+|---|---|---|
+| לקוחות | ממשק משתמש, כלי שורת פקודה | `frontend/`, `tools/`, `eval/` |
+| API | אימות, הגבלות קצב, מחזור חיי עבודה, SSE, ייצוא | `backend/api/` |
+| ליבה | צינור העיבוד, ניקוד, אימות, בניית שורות | `backend/core/` |
+| Ports | ממשקים ומודלי נתונים | `backend/core/ports/` |
+| Adapters | Tesseract, zxing, Gemini/OpenRouter/Groq, SQLite, xlsx/csv/json | `backend/adapters/` |
+| Composition root | המקום היחיד שבונה מתאמים ומזריק אותם | `backend/container.py` |
 
-## Tools and models
+**ה-API (`/v1`)** — העלאת מסמך או אצווה, מעקב אחר עבודה (כולל זרם התקדמות), תוצאות, תמונות וחיתוכים,
+עריכה ובחירת מועמד, ביטול, אישור, יומן ביקורת, ייצוא, מחיקה מיידית, מצב לחץ, ומדדים. כל נתיב
+דורש `X-API-Key`; העלאות דורשות גם קוד גישה ותומכות ב-`Idempotency-Key`. החוזה המלא:
+[docs/openapi.json](docs/openapi.json).
 
-**Local engine:** Tesseract 5 (Hebrew + English) · zxing-cpp (barcodes, any symbology) ·
-OpenCV headless (orientation, deskew, CLAHE) · pypdfium2 · TrOCR-small ONNX int8 (handwritten
-digits) · YOLOv8n ONNX (region detection, included only if it won the bake-off) · rapidfuzz ·
-Pydantic v2.
+פירוט מלא: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-**Cloud, free tiers:** Gemini 3 Flash (page read) · Gemini 2.5 Flash (blind verification) ·
-fallback OpenRouter free vision models.
+## 9. שכבת הלמידה
 
-**Application:** FastAPI · React + Vite + TypeScript + Tailwind + Radix · openpyxl · SQLite.
+**"לומדת איפה, לא מי."** אין fine-tuning — אין מספיק נתונים, וזה היה מחייב לשמור מידע אישי. במקום
+זה, אחרי כל שורה שהלבורנטית מאשרת, נשמרים:
 
-**Infrastructure, all free:** Vercel · Render (Docker) · UptimeRobot · Hugging Face Space
-(standby) · GitHub Actions.
+- **מיקום** השדה בעמוד (תיבה מנורמלת) ונוסח התווית שלידו;
+- **צורה מופשטת** של הערך (`X132767` ← `A######`), לא הערך עצמו;
+- **מילות מפתח** מכותרת המוסד.
 
-**Offline training only, not shipped at runtime:** ultralytics (AGPL-3.0), transformers, optimum.
+כל כתיבה למאגר עוברת בדיקה שדוחה שמות, מספרי זהות, תאריכים, ערכים ותמונות. רמז משפיע על הניקוד רק
+אחרי **שלושה** אישורים, ותווית או מוסד חדשים דורשים אישור מפורש. כל שינוי התנהגות ניתן למעקב
+ולביטול.
 
-## Privacy
+## 10. פרטיות ואבטחה
 
-Medical forms contain the most sensitive category of personal information, so the engine is built
-to send as little as possible:
+טפסים רפואיים הם הקטגוריה הרגישה ביותר של מידע אישי.
 
-- Only **crops** of unresolved fields leave the machine, never a full page.
-- Clinical regions — diagnosis, requested test, physician notes — are **never** sent.
-- All page images and extracted values are purged after 30 minutes.
-- No personal data in logs or in the learning store, which keeps only field *locations* and
-  abstracted value *shapes*.
-- `LOCAL_ONLY=true` makes the engine fully offline.
+- **אזורים קליניים** (אבחנה, בדיקה מבוקשת, הערות רופא) לעולם לא נשלחים — נאכף ב-assertion, לא
+  במוסכמה.
+- **מחיקה אוטומטית** של כל התמונות והערכים אחרי 30 דקות, ומחיקה מיידית לפי בקשה.
+- **אין מידע אישי בלוגים** — הסינון הוא שלב קבוע ב-pipeline של הלוגים, אי אפשר "לשכוח" אותו.
+- **הזרקת פרומפט לא רלוונטית**: טקסט בתמונה מוגדר כנתונים, התשובה חייבת לעמוד בסכמה קשיחה, למודל
+  אין כלים ואין רשת, והאימות רץ אחרי התשובה.
+- **`LOCAL_ONLY=true`** — המנוע רץ מקומית לחלוטין, אפס קריאות רשת (נבדק בטסט).
+- **`CLOUD_REQUIRES_CONSENT=true`** — רק טפסי הדוגמה, או עבודות עם הסכמה מפורשת, מגיעים לענן.
 
-Details: [`docs/privacy.md`](docs/privacy.md). Medical information is "sensitive information"
-under the Israeli Privacy Protection Law; a real deployment requires Ministry of Health
-information-security approval. This repository is not legal advice.
+> **חשוב:** במצב ברירת המחדל העמוד המלא נשלח לספק הענן. זה מקובל לטפסי הדוגמה המותאמים של האתגר
+> בלבד — השכבה החינמית של Gemini עשויה להשתמש בקלט לאימון. פריסה אמיתית דורשת מפתח בתשלום (ללא
+> אימון על הקלט) או `LOCAL_ONLY=true`, וכן אישור אבטחת מידע של משרד הבריאות. מידע רפואי הוא "מידע
+> רגיש" לפי חוק הגנת הפרטיות. מאגר זה אינו ייעוץ משפטי.
 
-## Repository
+פירוט: [docs/privacy.md](docs/privacy.md).
 
-| Path | Contents |
+## 11. הערכה ומדדים
+
+ההערכה הסופית נמדדת על **15 עמודים מוחזקים בצד** (held-out) מתוך 48 עמודי הדוגמה — עמודים שלא
+שימשו לכיול, לכתיבת כללים, לכוונון פרומפטים או לבחירת קוראים.
+
+| מדד | יעד | תוצאה |
+|---|---|---|
+| טעות שקטה (שגוי **ולא** מסומן) | ≤ 1% | טרם נמדד |
+| Flag recall (שגויים שסומנו ÷ כל השגויים) | ≥ 95% | טרם נמדד |
+| דיוק בשדות מודפסים | ≥ 98% | טרם נמדד |
+| דיוק בשדות בכתב יד | ≥ 90% | טרם נמדד |
+| 30 טפסים מקצה לקצה | פחות מ-4 דקות | טרם נמדד |
+| עלות פיתוח | $0 | $0 |
+
+הטבלה תמולא רק אחרי הרצת [eval/run_eval.py](eval/run_eval.py) על העמודים המוחזקים עם המנוע הנוכחי.
+מדידה ראשונית על שלושה עמודי דוגמה (לא הערכה) מתועדת ב-[ADR-017](docs/decisions/ADR-017-vision-first.md).
+מה עדיין לא עובד טוב — כתב יד עברי, אזורים בפריסות לא מוכרות, נגישות, ועוד:
+[docs/limitations.md](docs/limitations.md).
+
+## 12. טכנולוגיות
+
+| תחום | כלים |
 |---|---|
-| `docs/PLAN.md` | The complete specification: domain, architecture, pipeline, 30 tasks |
-| `docs/ARCHITECTURE.md` | Ports and adapters, data flow, decision records |
-| `docs/limitations.md` | What does not work yet, and licence notices |
-| `.kiro/steering/` | Always-on project rules and code conventions |
-| `.kiro/skills/` | Procedures: run the evaluation, add an institution, train the detector |
-| `backend/` | FastAPI service and the pure-Python engine |
-| `frontend/` | React RTL review workspace |
-| `config/` | Closed sender list, model selection, versioned prompts |
-| `eval/` | Gold set tooling, augmentation, metrics, bake-off |
-| `reference/` | The four challenge PDFs — **git-ignored** |
+| מודלי ראייה (ענן, שכבה חינמית) | Gemini 3 Flash / 2.5 Flash, גיבוי OpenRouter ו-Groq |
+| מנוע מקומי | Tesseract 5 (עברית + אנגלית), zxing-cpp, OpenCV headless, pypdfium2, TrOCR-small ONNX int8 (ספרות בכתב יד), rapidfuzz, Pydantic v2 |
+| שרת | FastAPI, SQLite, openpyxl, structlog |
+| ממשק | React, Vite, TypeScript, Tailwind, Radix |
+| תשתית | Docker, Hugging Face Spaces, GitHub Actions |
+| בדיקות | pytest (יחידה, אינטגרציה, אבטחה, חוסן), Vitest, Playwright, axe-core |
 
-## Licence
+## 13. הרצה ופריסה
 
-[MIT](LICENSE) for our code. Third-party notices in [`docs/limitations.md`](docs/limitations.md).
+### דרישות מוקדמות
+
+| רכיב | גרסה | הערות |
+|---|---|---|
+| Python | 3.12 ומעלה | |
+| Node.js | 20 | לבניית הממשק |
+| Tesseract OCR | 5, **עם חבילת עברית** | בלי עברית השרת מחזיר 503 ומסרב להעלאות. ב-Windows: [המתקין של UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki), לסמן Hebrew בזמן ההתקנה |
+| מפתח Gemini | חינמי | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) |
+
+לא רוצים להתקין כלום מזה? דלגו ל[הרצה עם Docker](#הרצה-עם-docker) — הקונטיינר כולל הכל.
+
+### שלב 1 — קובץ הגדרות
+
+```powershell
+cp .env.example .env
+```
+
+ממלאים ב-`.env`:
+
+| משתנה | מה לשים |
+|---|---|
+| `GEMINI_API_KEYS` | המפתח מ-AI Studio (כמה מפתחות — מופרדים בפסיק) |
+| `APP_ACCESS_CODE` | **סיסמת הכניסה למערכת** — בוחרים אותה בעצמכם, למשל `virology2026` |
+| `API_KEY` | **להשאיר ריק** בהרצה מקומית. הממשק לא שולח מפתח כזה, וערך כאן יגרום ל-401 |
+| `TESSERACT_CMD` | ב-Windows: `C:\Program Files\Tesseract-OCR\tesseract.exe` |
+
+### שלב 2 — התקנה, בנייה והרצה
+
+```powershell
+pip install -r requirements.txt
+cd frontend; npm ci; $env:VITE_API_BASE="/v1"; npx vite build; cd ..
+python -m uvicorn backend.app:app --port 8000
+```
+
+### שלב 3 — כניסה
+
+1. פותחים [http://localhost:8000](http://localhost:8000).
+2. במסך הכניסה מקלידים את **קוד הגישה** — הערך של `APP_ACCESS_CODE` מ-`.env`.
+3. מעלים טופס (PDF, PNG, JPG או ZIP) ועוקבים אחרי העיבוד עד מסך הסקירה.
+
+בדיקת תקינות: [http://localhost:8000/v1/health](http://localhost:8000/v1/health) מחזיר `ok` כשהכל מוכן.
+
+### הרצה עם Docker
+
+```powershell
+docker build -t safeline .
+docker run -p 8000:8000 --env-file .env safeline
+```
+
+גם כאן — `APP_ACCESS_CODE` הוא קוד הכניסה, ו-`API_KEY` נשאר ריק. `TESSERACT_CMD` לא נדרש.
+
+### פריסה לענן
+
+Hugging Face Space חינמי, צעד אחר צעד: [docs/DEPLOY.md](docs/DEPLOY.md). קוד הגישה לסביבה הציבורית
+נמסר לשופטים בתיאור ההגשה, לא במאגר.
+
+### הגדרות נוספות
+
+הרשימה המלאה, עם הסבר לכל משתנה: [.env.example](.env.example). החשובות:
+
+| משתנה | תפקיד |
+|---|---|
+| `ENGINE_MODE` | `vision_first` (ברירת מחדל) או `cascade` (המסלול המקומי) |
+| `LOCAL_ONLY` | `true` = אפס קריאות רשת |
+| `JOB_TTL_MINUTES` | זמן עד מחיקה אוטומטית (ברירת מחדל 30) |
+
+> **מכסה:** בשכבה החינמית של Gemini יש כ-20 בקשות ביום לכל מודל. 30 טפסים צורכים כ-40 בקשות.
+
+## 14. מבנה המאגר
+
+| נתיב | תוכן |
+|---|---|
+| `backend/core/` | ליבת המנוע: צינור העיבוד, ניקוד, אימות, בניית שורות |
+| `backend/adapters/` | מימושים: OCR, ברקודים, ספקי ראייה, אחסון, ייצוא, למידה |
+| `backend/api/` | נתיבי FastAPI |
+| `backend/tests/` | טסטים: יחידה, אינטגרציה, אבטחה, חוסן |
+| `frontend/` | ממשק הסקירה, React בעברית מימין לשמאל |
+| `config/` | רשימת השולחים הסגורה, ספים ומודלים, פרומפטים בגרסאות |
+| `eval/` | כלי ה-gold set, הגברת נתונים, מדדים, השוואת קוראים |
+| `tools/`, `scripts/` | כלי עזר ובדיקות CI (שכבות, תיעוד, סודות, הגשה) |
+| `docs/` | אפיון, ארכיטקטורה, החלטות, פרטיות, מגבלות, פריסה |
+| `.kiro/` | כללי הפרויקט ונהלים (הרצת הערכה, הוספת מוסד, אימון גלאי) |
+| `reference/` | קבצי ה-PDF של האתגר — **לא בגיט** |
+
+## 15. מסמכים נוספים
+
+| מסמך | מה יש בו |
+|---|---|
+| [docs/PLAN.md](docs/PLAN.md) | האפיון המלא: ידע על הדומיין, ארכיטקטורה, צינור העיבוד, ניקוד, אבטחה, עיצוב, הערכה, משימות |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | שכבות, ports, זרימת נתונים, מעבר בין ספקים |
+| [docs/decisions/](docs/decisions/README.md) | רשומות החלטה (ADR) — למה כל דבר נעשה כפי שנעשה |
+| [docs/privacy.md](docs/privacy.md) | מדיניות פרטיות מלאה |
+| [docs/limitations.md](docs/limitations.md) | מה לא עובד, ורישיונות צד שלישי |
+| [docs/demo_script.md](docs/demo_script.md) | תסריט ההדגמה |
+| [docs/DEPLOY.md](docs/DEPLOY.md) | מדריך פריסה |
+
+## רישיון
+
+[MIT](LICENSE) לקוד שלנו. הודעות צד שלישי ב-[docs/limitations.md](docs/limitations.md).
