@@ -794,6 +794,7 @@ def test_readers_that_took_a_number_from_different_places_never_close_it(
         (["פיקסוביץ"], ConfidenceLevel.D),  # the enlarged name is another word: never green
         (["פינקלשטיין"], ConfidenceLevel.B),  # the enlarged name confirms the two readers
         ([], ConfidenceLevel.B),  # nothing read on the crop: no evidence either way
+        (["פינקלשטיין-ג"], ConfidenceLevel.B),  # a letter of the next word caught by the crop
     ],
 )
 def test_a_handwritten_name_both_readers_agree_on_must_survive_the_zoom(
@@ -905,3 +906,17 @@ def test_a_commitment_of_a_shape_the_institution_never_uses_is_never_green(
     assert result.level is level
     if level is ConfidenceLevel.D:
         assert result.reason == REASON_TEXT["commitment_shape"]
+
+
+def test_a_reading_missing_a_real_letter_is_another_name(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    """Kaplan: "אור" for a handwritten "מאור" - one letter, but not a silent one."""
+    vision = Scripted(page=page_json(first_name=_hand("אור", [100, 520, 140, 700])))
+    verify = Scripted(page=page_json(first_name=_hand("מאור", [100, 520, 140, 700])))
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify)
+    )
+
+    assert outcome is not None
+    assert outcome.results[FieldKey.first_name].level is ConfidenceLevel.D

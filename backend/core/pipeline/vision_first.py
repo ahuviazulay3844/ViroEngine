@@ -490,6 +490,24 @@ def _edit_distance(a: str, b: str) -> int:
     return row[-1]
 
 
+# Letters Hebrew spelling adds or leaves out without changing the name ("ישראל"/"ישרל",
+# "מאיר"/"מאר"). Any other missing letter is another name: "אור" is not "מאור".
+_SILENT_LETTERS: Final = frozenset("אהוי")
+
+
+def _one_name(a: str, b: str) -> bool:
+    """True when two normalized readings are the same name: equal, or one silent letter apart."""
+    if a == b:
+        return True
+    short, long_ = sorted((a, b), key=len)
+    if len(long_) - len(short) != 1:
+        return False
+    for i, ch in enumerate(long_):
+        if long_[:i] + long_[i + 1 :] == short:
+            return ch in _SILENT_LETTERS
+    return False
+
+
 def _as_level_c(evaluation: FieldEvaluation, value: str) -> FieldEvaluation:
     result = evaluation.result.model_copy(
         update={"value": value, "display_value": value, "level": ConfidenceLevel.C, "reason": None}
@@ -532,7 +550,7 @@ def _settle(key: FieldKey, evaluation: FieldEvaluation) -> FieldEvaluation:
         second = [c.value for c in result.candidates if SECOND_READ_NOTE in c.notes]
         if first and second:
             a, b = normalize_name(first[0]) or "", normalize_name(second[0]) or ""
-            if a and b and _edit_distance(a, b) <= 1:
+            if a and b and _one_name(a, b):
                 return _as_level_c(evaluation, first[0])
     return evaluation
 
@@ -802,15 +820,18 @@ def _zoom_veto(evaluations: dict[FieldKey, FieldEvaluation], keys: Sequence[Fiel
     agreed = {k: normalize_name(evaluations[k].result.value or "") or "" for k in NAME_FIELDS}
     for key in keys:
         ev = evaluations[key]
+        # The crop is cut generously and can catch a letter of the neighbouring word
+        # ("טובה-ג"): it is split into words, and any word that is the name confirms it.
         zoom_words = [
             word
             for c in ev.result.candidates
             if reader_role(c) == "zoom"
-            for word in (normalize_name(c.value) or "").split()
+            for word in re.split(r"[^\u0590-\u05ffA-Za-z']+", normalize_name(c.value) or "")
+            if len(word) > 1
         ]
         if not zoom_words or not agreed[key]:
             continue
-        near = [w for w in zoom_words if _edit_distance(w, agreed[key]) <= 1]
+        near = [w for w in zoom_words if _one_name(w, agreed[key])]
         other = [w for k, v in agreed.items() if k is not key and v for w in zoom_words if w == v]
         if near or len(other) == len(zoom_words):
             continue
