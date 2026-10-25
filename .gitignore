@@ -136,3 +136,9 @@ TODO.local.md
 # --- Logo crops are sample data; only the manifest is committed ---
 config/logos/*
 !config/logos/manifest.json
+
+# Packed training (scripts/training_pack.py). The learning store has no values and is tracked so
+# Render builds with it; packed few-shot pages are not.
+deploy/seed/*
+!deploy/seed/README.md
+!deploy/seed/learning.sql

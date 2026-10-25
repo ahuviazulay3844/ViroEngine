@@ -63,6 +63,14 @@ ENV DATA_DIR=/tmp/safeline
 ENV STATIC_DIR=/app/frontend/dist
 RUN mkdir -p /tmp/safeline && chown safeline:safeline /tmp/safeline && chmod 700 /tmp/safeline
 
+# --- Training carried from the developer machine ---------------------------
+# deploy_hf.ps1 packs the few-shot example pages and the learning store into deploy/seed/ (as
+# text: a Space refuses binary files without LFS). Empty in a plain build: then nothing happens.
+COPY deploy/seed/ ./deploy/seed/
+RUN python scripts/training_pack.py unpack deploy/seed \
+        --fewshot /app/reference/fewshot --db /tmp/safeline/learning.db \
+ && chown -R safeline:safeline /tmp/safeline
+
 # --- Switch to non-root user -----------------------------------------------
 USER safeline
 

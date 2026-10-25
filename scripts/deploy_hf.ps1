@@ -3,8 +3,10 @@
   Publish the committed project to a Hugging Face Docker Space (API + web app in one container).
 
 .DESCRIPTION
-  Takes ONLY what is committed in git (`git archive HEAD`), so `.env`, `reference/` (the sample
-  PDFs) and anything else git-ignored can never reach the Space. Replaces README.md with the
+  Takes ONLY what is committed in git (`git archive HEAD`), so `.env`, the sample PDFs and
+  anything else git-ignored can never reach the Space - except the training, added on purpose:
+  the few-shot example pages and the learning store (no values), packed as text by
+  scripts/training_pack.py so the Space reads like this machine. Replaces README.md with the
   Space's README (deploy/huggingface/README.md, which carries the `sdk: docker` front matter),
   drops binary files the Space would refuse without LFS, and force-pushes one commit to the Space.
 
@@ -42,6 +44,9 @@ try {
   # A Space refuses binary files that are not in LFS; the image does not need them.
   Get-ChildItem $site -Recurse -File -Include *.png, *.jpg, *.jpeg, *.pdf, *.onnx |
     Remove-Item -Force
+  # What the engine learned here (few-shot pages + learning store), packed as text for the image.
+  python (Join-Path $root "scripts/training_pack.py") pack --out (Join-Path $site "deploy/seed")
+  if ($LASTEXITCODE -ne 0) { throw "Packing the training failed." }
 
   Push-Location $site
   try {
