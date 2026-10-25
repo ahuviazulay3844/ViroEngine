@@ -61,6 +61,9 @@ COPY --from=web /web/dist ./frontend/dist
 # Nothing survives a restart — this is the privacy guarantee.
 ENV DATA_DIR=/tmp/safeline
 ENV STATIC_DIR=/app/frontend/dist
+# Solved example pages shown before every page read: the committed copies (staff details blacked
+# out), since reference/ never enters the image.
+ENV VISION_FEWSHOT_DIR=/app/config/fewshot
 RUN mkdir -p /tmp/safeline && chown safeline:safeline /tmp/safeline && chmod 700 /tmp/safeline
 
 # --- Training carried from the developer machine ---------------------------

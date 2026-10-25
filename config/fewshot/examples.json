@@ -1,0 +1,260 @@
+{
+  "_note": "Solved example pages for the Gemini page read (few-shot). Values transcribed from the sample forms - git-ignored. Every answer is validated with the live parser at load time. Check: python -m backend.adapters.vision.fewshot",
+  "examples": [
+    {
+      "image": "A1.jpg",
+      "page": {
+        "page_role": "primary_form",
+        "sender": "מאוחדת",
+        "sender_box": [
+          25,
+          680,
+          72,
+          968
+        ],
+        "patient_address": "שלמציון המלכה 241 אלעזר",
+        "first_name": {
+          "value": "ישראל",
+          "label": "שם",
+          "source": "handwritten",
+          "box": [
+            800,
+            835,
+            817,
+            928
+          ]
+        },
+        "last_name": {
+          "value": "ישראלי",
+          "label": "שם",
+          "source": "handwritten",
+          "box": [
+            800,
+            712,
+            817,
+            832
+          ]
+        },
+        "national_id": {
+          "value": "0011223344",
+          "label": "ת\"ז",
+          "source": "handwritten",
+          "box": [
+            782,
+            755,
+            797,
+            895
+          ]
+        },
+        "receipt_date": {
+          "value": "18-06-2026",
+          "label": "התקבל",
+          "source": "stamp",
+          "box": [
+            682,
+            208,
+            700,
+            351
+          ]
+        },
+        "central_number": [
+          {
+            "value": "939376",
+            "label": "",
+            "source": "printed",
+            "box": [
+              58,
+              234,
+              73,
+              305
+            ]
+          }
+        ],
+        "commitment_number": [
+          {
+            "value": "730578626",
+            "label": "התחייבות מספר",
+            "source": "printed",
+            "box": [
+              156,
+              400,
+              171,
+              519
+            ]
+          }
+        ],
+        "ambiguities": []
+      }
+    },
+    {
+      "image": "A5.jpg",
+      "page": {
+        "page_role": "primary_form",
+        "sender": "כללית",
+        "sender_box": [
+          75,
+          405,
+          114,
+          588
+        ],
+        "patient_address": "",
+        "first_name": {
+          "value": "ישראל",
+          "label": "מטופל",
+          "source": "handwritten",
+          "box": [
+            209,
+            785,
+            226,
+            845
+          ]
+        },
+        "last_name": {
+          "value": "ישראלי",
+          "label": "מטופל",
+          "source": "handwritten",
+          "box": [
+            209,
+            712,
+            226,
+            784
+          ]
+        },
+        "national_id": {
+          "value": "01122334",
+          "label": "מטופל",
+          "source": "handwritten",
+          "box": [
+            208,
+            566,
+            226,
+            728
+          ]
+        },
+        "receipt_date": {
+          "value": "21-06-2026",
+          "label": "התקבל",
+          "source": "stamp",
+          "box": [
+            810,
+            505,
+            830,
+            620
+          ]
+        },
+        "central_number": [
+          {
+            "value": "939539",
+            "label": "",
+            "source": "printed",
+            "box": [
+              190,
+              100,
+              215,
+              170
+            ]
+          }
+        ],
+        "commitment_number": [
+          {
+            "value": "304497989",
+            "label": "מספר",
+            "source": "printed",
+            "box": [
+              178,
+              312,
+              195,
+              437
+            ]
+          }
+        ],
+        "ambiguities": []
+      }
+    },
+    {
+      "image": "A8.jpg",
+      "page": {
+        "page_role": "lab_report",
+        "sender": "לאומית שירותי בריאות",
+        "sender_box": [
+          60,
+          120,
+          95,
+          375
+        ],
+        "patient_address": "",
+        "first_name": {
+          "value": "ישראל",
+          "label": "שם ומשפחה",
+          "source": "handwritten",
+          "box": [
+            418,
+            677,
+            440,
+            760
+          ]
+        },
+        "last_name": {
+          "value": "ישראלי",
+          "label": "שם ומשפחה",
+          "source": "handwritten",
+          "box": [
+            418,
+            575,
+            440,
+            668
+          ]
+        },
+        "national_id": {
+          "value": "0011223344",
+          "label": "ת.ז.",
+          "source": "handwritten",
+          "box": [
+            380,
+            612,
+            397,
+            775
+          ]
+        },
+        "receipt_date": {
+          "value": "18-06-2026",
+          "label": "התקבל",
+          "source": "stamp",
+          "box": [
+            636,
+            255,
+            662,
+            375
+          ]
+        },
+        "central_number": [
+          {
+            "value": "939404",
+            "label": "",
+            "source": "printed",
+            "box": [
+              117,
+              160,
+              133,
+              233
+            ]
+          }
+        ],
+        "commitment_number": [
+          {
+            "value": "990012538",
+            "label": "דגימה",
+            "source": "printed",
+            "box": [
+              294,
+              627,
+              307,
+              724
+            ]
+          }
+        ],
+        "ambiguities": []
+      }
+    }
+  ]
+}
