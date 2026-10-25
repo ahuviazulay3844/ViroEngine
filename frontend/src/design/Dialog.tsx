@@ -10,10 +10,12 @@ export interface DialogProps {
   title: string;
   description?: string;
   children: ReactNode;
+  /** A wide panel, for an image. */
+  wide?: boolean;
 }
 
 /** Radix Dialog: focus trap, Esc to close and ARIA wiring come from the primitive. */
-export function Dialog({ open, onOpenChange, title, description, children }: DialogProps) {
+export function Dialog({ open, onOpenChange, title, description, children, wide = false }: DialogProps) {
   return (
     <RadixDialog.Root open={open} onOpenChange={onOpenChange}>
       <RadixDialog.Portal>
@@ -21,7 +23,7 @@ export function Dialog({ open, onOpenChange, title, description, children }: Dia
         <RadixDialog.Content
           // Without a description, opt out explicitly so Radix does not warn.
           {...(description ? {} : { 'aria-describedby': undefined })}
-          className="fixed inset-x-0 top-1/2 mx-auto w-[min(32rem,90vw)] -translate-y-1/2 rounded-lg bg-surface-raised p-5 shadow-raised"
+          className={`fixed inset-x-0 top-1/2 mx-auto ${wide ? 'w-[min(64rem,94vw)]' : 'w-[min(32rem,90vw)]'} -translate-y-1/2 rounded-lg bg-surface-raised p-5 shadow-raised`}
         >
           <div className="mb-4 flex items-start justify-between gap-4">
             <RadixDialog.Title className="text-xl font-semibold text-ink-strong">

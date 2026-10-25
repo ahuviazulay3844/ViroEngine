@@ -21,6 +21,8 @@ export interface FieldCellProps {
   field: FieldKey;
   result: FieldResult | undefined;
   selected: boolean;
+  /** Fade a cell that needs nothing (not level D), so flagged cells stand out. */
+  quiet?: boolean;
   onSelect?: (rowId: string, field: FieldKey) => void;
 }
 
@@ -29,7 +31,7 @@ export interface FieldCellProps {
  * never colour alone). Verified cells stay calm; only what needs the technician is tinted and
  * carries an accent edge and the reason. An empty value renders a dash, never a guess.
  */
-export function FieldCell({ rowId, field, result, selected, onSelect }: FieldCellProps) {
+export function FieldCell({ rowId, field, result, selected, quiet = false, onSelect }: FieldCellProps) {
   if (!result) {
     return (
       <Td className="px-4 py-3 text-ink-muted">
@@ -44,6 +46,7 @@ export function FieldCell({ rowId, field, result, selected, onSelect }: FieldCel
   const reasonText = result.reason ?? (text === null ? review.emptyFieldNote : null);
   const style = LEVEL_STYLE[result.level];
   const Icon = STATUS_ICON[result.level];
+  const faded = quiet && result.level !== 'D' && !selected;
 
   return (
     <Td
@@ -53,7 +56,7 @@ export function FieldCell({ rowId, field, result, selected, onSelect }: FieldCel
       aria-describedby={reasonText ? reasonId : undefined}
       className={`border-s-[3px] transition-colors duration-fast ${style.cell} ${
         selected ? 'outline outline-2 -outline-offset-2 outline-primary-500' : ''
-      }`}
+      } ${faded ? 'opacity-45' : ''}`}
     >
       <button
         type="button"

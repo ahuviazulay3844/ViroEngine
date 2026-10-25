@@ -10,7 +10,7 @@ import { COLUMNS } from '@/lib/columns';
 import { isFlagged } from '@/lib/level';
 import { ltr } from '@/lib/rtl';
 
-export type RowFilter = 'all' | 'review';
+export type RowFilter = 'all' | 'review' | 'verified';
 
 export interface SelectedCell {
   rowId: string;
@@ -32,9 +32,12 @@ export function flaggedFields(row: CommitmentRow): FieldKey[] {
   }).map((column) => column.key);
 }
 
-/** Rows visible under a filter. A row stays visible when any of its fields is flagged. */
+/** Rows visible under a filter: "review" keeps a row with any flagged field, "verified" a row
+ * with none. */
 export function visibleRows(rows: readonly CommitmentRow[], filter: RowFilter): CommitmentRow[] {
-  return filter === 'all' ? [...rows] : rows.filter((row) => flaggedFields(row).length > 0);
+  if (filter === 'all') return [...rows];
+  const wantFlagged = filter === 'review';
+  return rows.filter((row) => flaggedFields(row).length > 0 === wantFlagged);
 }
 
 export function ReviewTable({ rows, filter, selected, onSelectCell }: ReviewTableProps) {
@@ -44,7 +47,13 @@ export function ReviewTable({ rows, filter, selected, onSelectCell }: ReviewTabl
     return (
       <EmptyState
         illustration={<FileQuestion className="size-8" />}
-        title={rows.length === 0 ? review.emptyRows : review.filteredEmpty}
+        title={
+          rows.length === 0
+            ? review.emptyRows
+            : filter === 'verified'
+              ? review.filteredVerifiedEmpty
+              : review.filteredEmpty
+        }
       />
     );
   }
@@ -79,6 +88,8 @@ export function ReviewTable({ rows, filter, selected, onSelectCell }: ReviewTabl
                 field={column.key}
                 result={row.fields[column.key]}
                 selected={selected?.rowId === row.row_id && selected.field === column.key}
+                // In "for review" the verified cells step back so only what needs her stands out.
+                quiet={filter === 'review'}
                 onSelect={(rowId, field) => onSelectCell?.({ rowId, field })}
               />
             ))}

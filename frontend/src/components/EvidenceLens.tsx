@@ -1,11 +1,13 @@
+import { Maximize2 } from 'lucide-react';
 import { useState } from 'react';
 
 import type { Box } from '@/api/types';
 import { review } from '@/copy/he';
+import { Dialog } from '@/design/Dialog';
 import { useCrop } from '@/lib/useCrop';
 import type { CropClient } from '@/lib/useCrop';
 
-/** Magnification of the crop. A structural default from the plan (×3), not a tuned threshold. */
+/** Magnification of the enlarged view. A structural default from the plan (×3), not a tuned threshold. */
 const DEFAULT_ZOOM = 3;
 
 export interface EvidenceLensProps {
@@ -26,12 +28,13 @@ function percent(value: number): string {
 
 /**
  * Shows where a field was read: a page locator whose frame glides to the field's box (the motion
- * is what makes the spatial relationship legible), and the crop magnified beside it.
+ * is what makes the spatial relationship legible), and the crop beside it, fitted to the panel
+ * so it is read at a glance without scrolling; a click opens it large.
  * A missing image or box renders a placeholder, never an error.
  */
 export function EvidenceLens({ jobId, pageId, box, zoom = DEFAULT_ZOOM, label = '', client }: EvidenceLensProps) {
   const crop = useCrop(jobId, pageId, box, undefined, client);
-  const [natural, setNatural] = useState<{ width: number; height: number } | null>(null);
+  const [enlarged, setEnlarged] = useState(false);
 
   if (box === null) {
     return (
@@ -76,26 +79,35 @@ export function EvidenceLens({ jobId, pageId, box, zoom = DEFAULT_ZOOM, label = 
               {review.lensLoading}
             </p>
           ) : (
-            <div tabIndex={0} role="group" aria-label={review.lensRegion} className="max-h-48 overflow-auto rounded-md border border-surface-border bg-surface-raised">
+            // The whole crop fits the panel: nothing to scroll. A click opens it large.
+            <button
+              type="button"
+              onClick={() => setEnlarged(true)}
+              title={review.lensEnlarge}
+              className="group relative block w-full cursor-zoom-in overflow-hidden rounded-md border border-surface-border bg-surface-raised"
+            >
               <img
                 src={crop.url}
                 alt={review.lensAlt(label)}
-                onLoad={(event) =>
-                  setNatural({
-                    width: event.currentTarget.naturalWidth,
-                    height: event.currentTarget.naturalHeight,
-                  })
-                }
-                style={
-                  natural && natural.width > 0
-                    ? { width: natural.width * zoom, height: natural.height * zoom, maxWidth: 'none' }
-                    : undefined
-                }
+                className="mx-auto block h-auto max-h-80 w-full object-contain"
               />
-            </div>
+              <span className="absolute bottom-1 end-1 inline-flex items-center gap-1 rounded-pill bg-primary-900/75 px-2 py-0.5 text-[11px] text-ink-inverse opacity-80 group-hover:opacity-100">
+                <Maximize2 aria-hidden="true" className="size-3" />
+                {review.lensEnlarge}
+              </span>
+            </button>
           )}
         </div>
       </div>
+      {crop.url !== null ? (
+        <Dialog open={enlarged} onOpenChange={setEnlarged} title={label || review.lensRegion} wide>
+          <img
+            src={crop.url}
+            alt={review.lensAlt(label)}
+            className="mx-auto block max-h-[75vh] w-full object-contain"
+          />
+        </Dialog>
+      ) : null}
     </figure>
   );
 }

@@ -37,6 +37,12 @@ import { useReviewMutations } from '@/lib/useReviewMutations';
 
 type Tab = 'rows' | 'orphans';
 
+const FILTER_LABEL: Record<RowFilter, string> = {
+  all: review.filterAll,
+  review: review.filterReview,
+  verified: review.filterVerified,
+};
+
 const SEGMENTS = 'flex gap-1 rounded-pill bg-surface-sunken p-1';
 
 function segment(active: boolean): string {
@@ -271,7 +277,7 @@ export function Review({ client = api, clock = systemClock }: ReviewProps = {}) 
         ) : null}
         {tab === 'rows' ? (
           <div role="group" aria-label={review.filterLabel} data-filter-group="" className={SEGMENTS}>
-            {(['all', 'review'] as const).map((value) => (
+            {(['all', 'review', 'verified'] as const).map((value) => (
               <button
                 key={value}
                 type="button"
@@ -279,7 +285,15 @@ export function Review({ client = api, clock = systemClock }: ReviewProps = {}) 
                 onClick={() => setFilter(value)}
                 className={segment(filter === value)}
               >
-                {value === 'all' ? review.filterAll : review.filterReview}
+                {FILTER_LABEL[value]}
+                <span
+                  aria-hidden="true"
+                  className={`ms-2 inline-grid min-w-5 place-items-center rounded-pill px-1.5 text-xs ${
+                    value === 'review' ? 'bg-state-review-bg text-state-review-fg' : 'bg-surface-base'
+                  }`}
+                >
+                  {ltr(String(visibleRows(rows, value).length))}
+                </span>
               </button>
             ))}
           </div>
@@ -304,11 +318,11 @@ export function Review({ client = api, clock = systemClock }: ReviewProps = {}) 
           )}
         </section>
       ) : (
-        <div className="mt-5 grid gap-5 2xl:grid-cols-[minmax(0,3fr)_minmax(340px,1fr)]">
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
           <ReviewTable rows={job.rows} filter={filter} selected={selected} onSelectCell={setSelected} />
           <aside
             aria-labelledby="evidence-title"
-            className="flex flex-col gap-4 self-start rounded-lg border border-surface-border bg-surface-raised p-4 shadow-card"
+            className="flex flex-col gap-4 self-start rounded-lg border border-surface-border bg-surface-raised p-4 shadow-card xl:sticky xl:top-4"
           >
             <h2 id="evidence-title" className="text-xl">
               {review.evidenceTitle}
