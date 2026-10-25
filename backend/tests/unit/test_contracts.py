@@ -149,8 +149,9 @@ def test_reason_set_matches_plan_size() -> None:
     # PLAN §5.2's twelve, plus ADR-017's `often_corrected` (learned from staff corrections),
     # `name_label_unclear` (a name read beside a label that is not a name label) and
     # `year_inferred` (a receipt date written without its year) and `date_too_old` (a receipt
-    # date more than a year back: a misread year).
-    assert len(REASON_TEXT) == 16
+    # date more than a year back: a misread year) and `commitment_shape` (a commitment number of
+    # a shape its institution never uses).
+    assert len(REASON_TEXT) == 17
 
 
 @pytest.mark.parametrize(

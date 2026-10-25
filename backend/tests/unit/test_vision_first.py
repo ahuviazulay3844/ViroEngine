@@ -61,7 +61,8 @@ def page_json(**over: object) -> str:
         "page_role": "primary_form",
         "sender": "מאוחדת",
         "sender_box": [20, 600, 60, 950],
-        "first_name": {"value": "ישראל", "source": "handwritten", "box": BOX},
+        # Hebrew handwriting: the first name is the RIGHT word of the line (as on every sample).
+        "first_name": {"value": "ישראל", "source": "handwritten", "box": [100, 520, 140, 700]},
         "last_name": {"value": "ישראלי", "source": "handwritten", "box": [100, 320, 140, 500]},
         "national_id": {"value": ID, "source": "handwritten", "box": [160, 100, 190, 300]},
         "receipt_date": {"value": "18-06-2026", "source": "stamp", "box": [700, 100, 740, 300]},
@@ -521,7 +522,7 @@ def test_a_name_beside_a_foreign_looking_label_is_shown_but_reviewed(
 ) -> None:
     """A14: the model reported the label "שם" as 'ע"ש'. The correct name must stay visible, and a
     name not tied to a name label must never pass as confirmed - even when both readers agree."""
-    first = {"value": "ישראל", "label": 'ע"ש', "source": "handwritten", "box": BOX}
+    first = {"value": "ישראל", "label": 'ע"ש', "source": "handwritten", "box": [100, 520, 140, 700]}
     vision = Scripted(page=page_json(first_name=first))
     verify = Scripted(verify={FieldKey.first_name: ["ישראל"]})
     [outcome] = read_batch_vision(
@@ -831,3 +832,76 @@ def test_a_receipt_date_years_back_is_a_misread_year_and_stays_orange(
     assert result.level is ConfidenceLevel.D
     assert result.reason == REASON_TEXT["date_too_old"]
     assert result.value == "26/08/2020"  # shown, for the technician to correct the year
+
+
+def _hand(value: str, box: list[int]) -> dict[str, object]:
+    return {"value": value, "source": "handwritten", "box": box}
+
+
+def test_of_two_handwritten_hebrew_names_on_a_line_the_right_one_is_the_first_name(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    # Both readers put the LEFT word ("אזולאי", x 300-450) in first_name.
+    swapped = page_json(
+        first_name=_hand("אזולאי", [100, 300, 140, 450]),
+        last_name=_hand("מאור", [100, 500, 140, 650]),
+    )
+    vision = Scripted(
+        page=swapped, verify={FieldKey.first_name: ["מאור"], FieldKey.last_name: ["אזולאי"]}
+    )
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, Scripted(page=swapped))
+    )
+
+    assert outcome is not None
+    assert outcome.results[FieldKey.first_name].value == "מאור"
+    assert outcome.results[FieldKey.last_name].value == "אזולאי"
+
+
+def test_a_lone_reading_of_one_name_is_not_green_when_the_other_name_is_disputed(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    first = _hand("אלון", [100, 500, 140, 650])
+    vision = Scripted(
+        page=page_json(first_name=first, last_name=_hand("פינקלשטיין", [100, 300, 140, 450]))
+    )
+    verify = Scripted(
+        page=page_json(
+            first_name=_hand("", [0, 0, 0, 0]), last_name=_hand("פיקסוביץ", [100, 300, 140, 450])
+        )
+    )
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify)
+    )
+
+    assert outcome is not None
+    assert outcome.results[FieldKey.last_name].level is ConfidenceLevel.D
+    assert outcome.results[FieldKey.first_name].level is ConfidenceLevel.D
+
+
+@pytest.mark.parametrize(
+    ("number", "level"),
+    [("12043017", ConfidenceLevel.D), ("7254647", ConfidenceLevel.B)],  # case number vs 7 digits
+)
+def test_a_commitment_of_a_shape_the_institution_never_uses_is_never_green(
+    raw: PageRaw,
+    settings: Settings,
+    storage: TmpdirStorage,
+    imaging: CvImaging,
+    number: str,
+    level: ConfidenceLevel,
+) -> None:
+    page = page_json(
+        sender="וולפסון",
+        commitment_number=[{"value": number, "source": "printed", "box": [800, 100, 830, 200]}],
+    )
+    [outcome] = read_batch_vision(
+        [raw],
+        services=_page_mode(settings, storage, imaging, Scripted(page=page), Scripted(page=page)),
+    )
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.commitment_number]
+    assert result.level is level
+    if level is ConfidenceLevel.D:
+        assert result.reason == REASON_TEXT["commitment_shape"]

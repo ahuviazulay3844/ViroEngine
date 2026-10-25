@@ -95,6 +95,7 @@ REASON_TEXT: dict[str, str] = {
     "name_label_unclear": "השם לא נקרא ליד תווית של שם",
     "year_inferred": "השנה לא כתובה בטופס - הושלמה, בדקי",
     "date_too_old": "התאריך רחוק מדי מהיום - בדקי את השנה",
+    "commitment_shape": "המספר לא בצורה הקבועה של המוסד - בדקי",
 }
 
 
@@ -320,6 +321,10 @@ class SenderSpec(Strict):
     commitment_labels: list[str]
     commitment_deny: list[str] = Field(default_factory=list)
     pattern_hints: list[str] = Field(default_factory=list)  # hints only
+    # The exact shape of this institution's commitment number, set only where it is certain (the
+    # guide states it and every confirmed sample has it). A commitment of another shape is the
+    # wrong number on the page (a case number, a sticker barcode): it is never closed.
+    commitment_shape: str | None = None
     barcode_is_commitment: bool | None = None  # None = unknown
     notes: str | None = None
 

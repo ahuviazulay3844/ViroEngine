@@ -295,7 +295,8 @@
         "מס' ביקור",
         "מס' קליטה",
         "מספר מבחנה"
-      ]
+      ],
+      "commitment_shape": "^\\d{7}$"
     },
     {
       "canonical": "קפלן",
@@ -324,7 +325,8 @@
         "מס' ביקור",
         "מס' קליטה",
         "מספר מבחנה"
-      ]
+      ],
+      "commitment_shape": "^666\\d{5}$"
     },
     {
       "canonical": "מאיר",
@@ -383,7 +385,8 @@
         "מס' ביקור",
         "מס' קליטה",
         "מספר מבחנה"
-      ]
+      ],
+      "commitment_shape": "^\\d{9}$"
     },
     {
       "canonical": "בני ציון",
@@ -1529,6 +1532,812 @@
         "התחייבות"
       ],
       "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "גהה לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז לבריאות הנפש גהה",
+        "בית החולים גהה"
+      ],
+      "keywords": [
+        "מרכז לבריאות הנפש גהה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "שלוותה לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז לבריאות הנפש שלוותה"
+      ],
+      "keywords": [
+        "מרכז לבריאות הנפש שלוותה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "בארות לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בארות - המרכז הרפואי לבריאות הנפש",
+        "המרכז הרפואי לבריאות הנפש באר שבע"
+      ],
+      "keywords": [
+        "בארות - המרכז הרפואי לבריאות הנפש"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "שער מנשה לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז לבריאות הנפש שער מנשה"
+      ],
+      "keywords": [
+        "המרכז לבריאות הנפש שער מנשה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "מזור לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי לבריאות הנפש מזור"
+      ],
+      "keywords": [
+        "המרכז הרפואי לבריאות הנפש מזור"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "נווה שלווה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים נווה שלווה"
+      ],
+      "keywords": [
+        "בית החולים נווה שלווה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "המרכז הירושלמי לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הירושלמי לבריאות הנפש",
+        "בית החולים כפר שאול",
+        "המרכז לבריאות הנפש איתנים"
+      ],
+      "keywords": [
+        "המרכז הירושלמי לבריאות הנפש"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "טלביה לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז לבריאות הנפש טלביה"
+      ],
+      "keywords": [
+        "מרכז לבריאות הנפש טלביה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "מרחבים לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרחבים - המרכז הרפואי לטיפול במוח ובנפש"
+      ],
+      "keywords": [
+        "מרחבים - המרכז הרפואי לטיפול במוח ובנפש"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "מעלה הכרמל לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי לבריאות הנפש מעלה הכרמל"
+      ],
+      "keywords": [
+        "המרכז הרפואי לבריאות הנפש מעלה הכרמל"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אברבנאל לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי לבריאות הנפש אברבנאל"
+      ],
+      "keywords": [
+        "המרכז הרפואי לבריאות הנפש אברבנאל"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "לב השרון לבריאות הנפש",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז רפואי לבריאות הנפש לב השרון"
+      ],
+      "keywords": [
+        "מרכז רפואי לבריאות הנפש לב השרון"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "לוינשטיין",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי לשיקום לוינשטיין",
+        "בית לוינשטיין"
+      ],
+      "keywords": [
+        "המרכז הרפואי לשיקום לוינשטיין"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "שמואל הרופא",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים שמואל הרופא"
+      ],
+      "keywords": [
+        "בית החולים שמואל הרופא"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "הרצפלד",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי שיקומי גריאטרי הרצפלד",
+        "בית החולים הרצפלד"
+      ],
+      "keywords": [
+        "המרכז הרפואי שיקומי גריאטרי הרצפלד"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "עדי נגב - נחלת ערן",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים עדי נגב - נחלת ערן",
+        "עדי נגב"
+      ],
+      "keywords": [
+        "בית החולים עדי נגב - נחלת ערן"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "שהם - נווה אבות",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז המשולב לרפואה גריאטרית שהם",
+        "נווה אבות"
+      ],
+      "keywords": [
+        "המרכז המשולב לרפואה גריאטרית שהם"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "קריית שלמה גריאטריה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים קריית שלמה גריאטרי",
+        "קריית שלמה גריאטריה"
+      ],
+      "keywords": [
+        "בית החולים קריית שלמה גריאטרי"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "נווה רעיה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית חולים נווה רעיה"
+      ],
+      "keywords": [
+        "בית חולים נווה רעיה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "סטוצ'ינסקי",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז רמת גן לחולי אלצהיימר ע\"ש סטוצ'ינסקי"
+      ],
+      "keywords": [
+        "מרכז רמת גן לחולי אלצהיימר ע\"ש סטוצ'ינסקי"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "רעות שיקום",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז רפואי רעות תל אביב",
+        "רעות שיקום"
+      ],
+      "keywords": [
+        "מרכז רפואי רעות תל אביב"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "נאות המושבה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית חולים נאות המושבה"
+      ],
+      "keywords": [
+        "בית חולים נאות המושבה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "בית רבקה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית רבקה",
+        "מרכז גריאטרי בית רבקה"
+      ],
+      "keywords": [
+        "בית רבקה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "הרצוג ירושלים",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית חולים הרצוג ירושלים",
+        "המרכז הרפואי הרצוג ירושלים"
+      ],
+      "keywords": [
+        "בית חולים הרצוג ירושלים"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "פלימן",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הגריאטרי-שיקומי פלימן"
+      ],
+      "keywords": [
+        "המרכז הגריאטרי-שיקומי פלימן"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אלי\"ן",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית חולים אלי\"ן",
+        "אלי\"ן"
+      ],
+      "keywords": [
+        "בית חולים אלי\"ן"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "עמל הוד אדומים",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית חולים עמל הוד אדומים"
+      ],
+      "keywords": [
+        "בית חולים עמל הוד אדומים"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "קריית בנימין",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי גריאטרי קריית בנימין"
+      ],
+      "keywords": [
+        "המרכז הרפואי גריאטרי קריית בנימין"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "בית בלב",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית בלב"
+      ],
+      "keywords": [
+        "בית בלב"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "בית הדר אשדוד",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית הדר אשדוד"
+      ],
+      "keywords": [
+        "בית הדר אשדוד"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "דורות שיקום וגריאטריה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "דורות - מרכז רפואי לשיקום וגריאטריה"
+      ],
+      "keywords": [
+        "דורות - מרכז רפואי לשיקום וגריאטריה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "המרכז הגריאטרי ראשון לציון",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הגריאטרי ראשון לציון"
+      ],
+      "keywords": [
+        "המרכז הגריאטרי ראשון לציון"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "סנט ג'ון",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים סנט ג'ון",
+        "st john eye hospital"
+      ],
+      "keywords": [
+        "בית החולים סנט ג'ון"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "Wikipedia 'בתי חולים בישראל' (2026-10-25); grammar not yet observed; generic labels.",
       "commitment_deny": [
         "מקרה",
         "מס' ביקור",

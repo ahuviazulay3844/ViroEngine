@@ -782,13 +782,14 @@ def _disputed(evaluations: dict[FieldKey, FieldEvaluation]) -> list[FieldKey]:
 
 
 def _names_to_zoom(evaluations: dict[FieldKey, FieldEvaluation]) -> list[FieldKey]:
-    """Handwritten names the two whole-page readers agreed on. Both readers see the same reduced
-    page, so on small cursive they can invent the same familiar name (part 3: "פינקלשטיין" for a
-    handwritten "פיקסוביץ"); a zoomed read of the name must not contradict them (`_zoom_veto`)."""
+    """Handwritten names that would be shown green (A-C). Both whole-page readers see the same
+    reduced page, so on small cursive they can invent the same familiar name (part 3:
+    "פינקלשטיין" for a handwritten "פיקסוביץ"), and a single reading is no better; a zoomed read
+    of the name must not contradict it (`_zoom_veto`)."""
     return [
         key
         for key in NAME_FIELDS
-        if evaluations[key].result.level in (ConfidenceLevel.A, ConfidenceLevel.B)
+        if evaluations[key].result.level is not ConfidenceLevel.D
         and evaluations[key].result.source is SourceKind.handwritten
         and any(c.box is not None for c in evaluations[key].result.candidates)
     ]
@@ -818,6 +819,72 @@ def _zoom_veto(evaluations: dict[FieldKey, FieldEvaluation], keys: Sequence[Fiel
             update={"value": ev.result.value, "display_value": ev.result.value}
         )
         evaluations[key] = FieldEvaluation(result=shown, signals=flagged.signals, evidence=None)
+
+
+def _flag_lone_name(evaluations: dict[FieldKey, FieldEvaluation]) -> None:
+    """First and family name are read in one glance: when one of them is in dispute, the other
+    is not trusted on a single reading (level C) - it goes to level D `handwriting_unverified`,
+    still shown. A name two readers agreed on (A/B) keeps its level. In place."""
+    if not any(evaluations[k].result.level is ConfidenceLevel.D for k in NAME_FIELDS):
+        return
+    for key in NAME_FIELDS:
+        ev = evaluations[key]
+        if ev.result.level is ConfidenceLevel.C and ev.result.value:
+            evaluations[key] = flag_for_review(ev, "handwriting_unverified")
+
+
+def _same_line(a: Box, b: Box) -> bool:
+    """True when two boxes share most of their height: two words of one written line."""
+    overlap = min(a[2], b[2]) - max(a[0], b[0])
+    return overlap > 0.5 * min(a[2] - a[0], b[2] - b[0])
+
+
+def _hebrew(text: str) -> bool:
+    return any("\u0590" <= ch <= "\u05ff" for ch in text)
+
+
+def _order_names_by_place(page: _Page) -> None:
+    """Hebrew is written right to left and the lab writes the first name first, so of two
+    handwritten Hebrew names on one line the RIGHT one is the first name. A reader that put the
+    left word in first_name had the order wrong: its two readings change fields (the box goes
+    with its word, so a zoomed crop is cut around the right word). Decided per reader, only when
+    both of its names are handwritten Hebrew on one line; anything else is left as read."""
+    firsts = list(page.reads.get(FieldKey.first_name, []))
+    lasts = list(page.reads.get(FieldKey.last_name, []))
+    for role in ("page", "verify"):
+        f = [c for c in firsts if reader_role(c) == role and c.box is not None]
+        g = [c for c in lasts if reader_role(c) == role and c.box is not None]
+        if len(f) != 1 or len(g) != 1:
+            continue
+        a, b = f[0], g[0]
+        if a.box is None or b.box is None:
+            continue
+        handwritten = a.source is SourceKind.handwritten and b.source is SourceKind.handwritten
+        if not (handwritten and _hebrew(a.value) and _hebrew(b.value) and _same_line(a.box, b.box)):
+            continue
+        if a.box[1] + a.box[3] < b.box[1] + b.box[3]:  # the "first" name is the left word
+            firsts = [b if c is a else c for c in firsts]
+            lasts = [a if c is b else c for c in lasts]
+    if FieldKey.first_name in page.reads:
+        page.reads[FieldKey.first_name] = firsts
+    if FieldKey.last_name in page.reads:
+        page.reads[FieldKey.last_name] = lasts
+
+
+def _flag_foreign_commitment(
+    evaluations: dict[FieldKey, FieldEvaluation], services: VisionServices
+) -> None:
+    """A commitment number of a shape its institution never uses (`SenderSpec.commitment_shape`)
+    is another number on the page - a case number, a sticker barcode - however many readers
+    agreed on it: level D `commitment_shape`, in place."""
+    sender = evaluations[FieldKey.sender].result.value
+    spec = services.senders.get(sender) if sender else None
+    shape = spec.commitment_shape if spec is not None else None
+    ev = evaluations[FieldKey.commitment_number]
+    if not shape or not ev.result.value or ev.result.level is ConfidenceLevel.D:
+        return
+    if re.fullmatch(shape, re.sub(r"\s", "", ev.result.value)) is None:
+        evaluations[FieldKey.commitment_number] = flag_for_review(ev, "commitment_shape")
 
 
 # A handwritten receipt date beside the central number often has no year ("25.8").
@@ -953,6 +1020,7 @@ def _outcome(
     t_score = time.perf_counter()
     sender_values = [c.value for c in page.reads.get(FieldKey.sender, [])]
     _complete_years(page, services)
+    _order_names_by_place(page)
     evaluations = _evaluate_all(page, services)
     disputed = _disputed(evaluations)
     zoomed_names = _names_to_zoom(evaluations)
@@ -966,6 +1034,8 @@ def _outcome(
     _flag_old_date(evaluations, services.clock.now().date())
     _resolve_swapped_names(evaluations, page)
     _zoom_veto(evaluations, zoomed_names)  # after the reordering, which would reset its level
+    _flag_lone_name(evaluations)
+    _flag_foreign_commitment(evaluations, services)
     _flag_shared_numbers(evaluations)
     _flag_twin_names(evaluations)
     _flag_unlabelled_names(evaluations, page)
@@ -973,7 +1043,15 @@ def _outcome(
     for key in _SHOWN_WHEN_DISPUTED:
         # The zoomed reader sees the name enlarged: on a dispute its reading is the one shown
         # (still orange), unless review has proven another reader better for this field.
-        prefer = _trusted_reader(key, services) or "zoom"
+        # Its crop holds both words: a zoomed reading that is the OTHER name says nothing here.
+        other = FieldKey.last_name if key is FieldKey.first_name else FieldKey.first_name
+        other_words = {normalize_name(c.value) for c in evaluations[other].result.candidates}
+        zoom_is_other = any(
+            normalize_name(c.value) in other_words
+            for c in evaluations[key].result.candidates
+            if reader_role(c) == "zoom"
+        )
+        prefer = _trusted_reader(key, services) or (None if zoom_is_other else "zoom")
         evaluations[key] = _show_first_reading(evaluations[key], prefer)
     answer = page.answer
     role = answer.page_role if answer is not None else "primary_form"

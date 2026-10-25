@@ -324,6 +324,7 @@ export interface SenderSpec {
   commitment_labels: string[];
   commitment_deny?: string[];
   pattern_hints?: string[];
+  commitment_shape?: string | null;
   barcode_is_commitment?: boolean | null;
   notes?: string | null;
 }
