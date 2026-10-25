@@ -108,7 +108,7 @@ export function createHttpClient(options: HttpClientOptions): ApiClient {
 uploadSingle(file, idempotencyKey) {
       const body = new FormData();
       body.append('file', file);
-      return request<UploadResponse>('/documents/upload', { // <-- תיקון ל- /documents/upload
+      return request<UploadResponse>('/documents', {
         method: 'POST',
         body,
         headers: uploadHeaders(idempotencyKey),
