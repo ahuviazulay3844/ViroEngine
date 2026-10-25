@@ -20,6 +20,15 @@
     @apply min-h-screen;
   }
 
+  /* The page scrolls without a visible bar: wheel, touch and keys still scroll it. */
+  html {
+    scrollbar-width: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
   h1 {
     @apply text-3xl font-bold text-ink-strong;
   }
@@ -33,6 +42,16 @@
     box-shadow: theme('boxShadow.focus');
     outline: 2px solid transparent;
     outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
   }
 }
 

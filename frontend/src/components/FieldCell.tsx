@@ -63,12 +63,12 @@ export function FieldCell({ rowId, field, result, selected, quiet = false, onSel
         data-cell-button=""
         aria-pressed={selected}
         onClick={() => onSelect?.(rowId, field)}
-        className="flex min-h-16 w-full flex-col items-start justify-center gap-1 px-4 py-3 text-start hover:bg-primary-100/40"
+        className="flex min-h-16 w-full flex-col items-start justify-center gap-1 px-3 py-3 text-start transition-colors duration-fast hover:bg-primary-100/50"
       >
         <span
-          className={`text-[15px] font-semibold leading-snug ${
+          className={`max-w-full break-words text-sm font-semibold leading-snug ${
             text === null ? 'text-ink-muted' : 'text-ink-strong'
-          } ${isIsolatedField(field) ? 'font-mono tracking-wide' : ''}`}
+          } ${isIsolatedField(field) ? 'font-mono' : ''}`}
         >
           {text === null ? (
             <span aria-hidden="true">{common.notAvailable}</span>

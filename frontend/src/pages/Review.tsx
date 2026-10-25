@@ -318,7 +318,7 @@ export function Review({ client = api, clock = systemClock }: ReviewProps = {}) 
           )}
         </section>
       ) : (
-        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+        <div className="mt-5 grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(320px,380px)]">
           <ReviewTable rows={job.rows} filter={filter} selected={selected} onSelectCell={setSelected} />
           <aside
             aria-labelledby="evidence-title"

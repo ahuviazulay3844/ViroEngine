@@ -60,10 +60,10 @@ export function ReviewTable({ rows, filter, selected, onSelectCell }: ReviewTabl
 
   return (
     <div data-review-grid="">
-    <Table caption={review.tableCaption}>
+    <Table caption={review.tableCaption} fit>
       <THead>
         <Tr>
-          <Th>{review.rowHeader}</Th>
+          <Th className="w-20">{review.rowHeader}</Th>
           {COLUMNS.map((column) => (
             <Th key={column.key}>{column.label}</Th>
           ))}
@@ -72,11 +72,13 @@ export function ReviewTable({ rows, filter, selected, onSelectCell }: ReviewTabl
       <TBody>
         {shown.map((row) => (
           <Tr key={row.row_id} data-row-level={row.row_level}>
-            <Th scope="row" className="relative ps-5 align-middle font-mono text-ink-base">
+            <Th scope="row" className="relative ps-4 align-middle font-mono text-ink-base">
               <ConfidenceRibbon level={row.row_level} flaggedCount={flaggedFields(row).length} />
-              <span className="flex flex-col leading-tight">
-                <span className="font-bold text-ink-strong">{ltr(String(rows.indexOf(row) + 1))}</span>
-                <span className="whitespace-nowrap text-[11px] text-ink-muted">
+              <span className="flex flex-col items-start gap-1 leading-tight">
+                <span className="grid size-7 place-items-center rounded-full bg-primary-100 text-xs font-bold text-primary-900">
+                  {ltr(String(rows.indexOf(row) + 1))}
+                </span>
+                <span className="whitespace-nowrap font-sans text-[11px] font-normal text-ink-muted">
                   {review.pageOf(row.page_ids.map((id) => id.split('#').pop() ?? id).join(', '))}
                 </span>
               </span>

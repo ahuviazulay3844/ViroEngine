@@ -79,7 +79,7 @@ export function Layout() {
       </a>
       <header className="relative overflow-hidden bg-gradient-to-l from-brand-to via-brand-via to-brand-from text-ink-inverse">
         <HeaderPattern />
-        <div className="relative mx-auto flex max-w-screen-xl flex-wrap items-center justify-between gap-4 px-5 pb-8 pt-4">
+        <div className="relative mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between gap-4 px-5 pb-8 pt-4">
           <NavLink to="/upload" className="flex items-center gap-3 rounded-md">
             <span className="grid size-10 place-items-center rounded-md bg-ink-inverse/10 ring-1 ring-ink-inverse/25">
               <Microscope aria-hidden="true" className="size-5 text-brand-glow" />
@@ -102,7 +102,7 @@ export function Layout() {
         </p>
       ) : null}
       {active >= 0 ? (
-        <div className="relative z-10 mx-auto -mt-5 w-full max-w-screen-xl px-5">
+        <div className="relative z-10 mx-auto -mt-5 w-full max-w-screen-2xl px-5">
           <ol
             aria-label={upload.stepsLabel}
             className="grid grid-cols-4 gap-1 rounded-lg border border-surface-border bg-surface-raised p-1 shadow-raised"
@@ -142,11 +142,11 @@ export function Layout() {
           </ol>
         </div>
       ) : null}
-      <main id="main" className="mx-auto w-full max-w-screen-xl flex-1 px-5 py-6">
+      <main id="main" className="mx-auto w-full max-w-screen-2xl flex-1 px-5 py-6">
         <Outlet />
       </main>
       <footer className="border-t border-surface-border bg-surface-raised">
-        <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-ink-muted">
+        <div className="mx-auto flex max-w-screen-2xl flex-wrap items-center justify-between gap-2 px-5 py-4 text-xs text-ink-muted">
           <span>{common.footer}</span>
           <span>{common.footerPrivacy}</span>
         </div>
