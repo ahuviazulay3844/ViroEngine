@@ -93,6 +93,8 @@ REASON_TEXT: dict[str, str] = {
     "multiple_candidates": "נמצאו כמה אפשרויות",
     "often_corrected": "שדה שתוקן לעיתים קרובות בעבר",
     "name_label_unclear": "השם לא נקרא ליד תווית של שם",
+    "year_inferred": "השנה לא כתובה בטופס - הושלמה, בדקי",
+    "date_too_old": "התאריך רחוק מדי מהיום - בדקי את השנה",
 }
 
 
@@ -365,6 +367,9 @@ class VisionRequest(Strict):
     barcode_candidates: list[str] = Field(default_factory=list)  # decoded from the sent crops
     prompt_version: str
     response_schema: dict[str, Any] = Field(default_factory=dict)
+    # False for the blind second page read: it must read the page itself, with no solved example
+    # whose values it could copy, so its agreement is independent evidence.
+    fewshot: bool = True
 
 
 class VisionAnswer(Strict):

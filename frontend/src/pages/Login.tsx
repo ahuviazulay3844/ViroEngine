@@ -33,6 +33,8 @@ export function Login() {
       const result = await api.login(code);
       if (result.ok) navigate('/upload');
       else setError('wrong');
+    } catch {
+      setError('wrong'); // the code could not be checked: never let the user through
     } finally {
       setBusy(false);
     }

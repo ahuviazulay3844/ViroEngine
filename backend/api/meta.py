@@ -1,4 +1,4 @@
-"""Meta endpoints — /v1/health, /v1/metrics.
+"""Meta endpoints — /v1/health, /v1/access, /v1/metrics.
 
 Health reports per-adapter readiness.
 Keys and credential values are NEVER included in the response — only labels and counts.
@@ -11,10 +11,10 @@ from pathlib import Path
 from typing import Any, Final
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 import structlog
 
-from backend.api.deps import get_container, get_store, require_api_key
+from backend.api.deps import get_container, get_store, require_access_code, require_api_key
 from backend.container import Container
 from backend.jobs import JobStore
 from backend.readiness import ocr_readiness
@@ -25,6 +25,14 @@ router = APIRouter(tags=["meta"])
 
 # Structural: where `eval/run_eval.py --emit-json` writes the latest report (git-ignored).
 EVAL_LATEST: Final = Path(__file__).resolve().parents[2] / "eval" / "results" / "latest.json"
+
+
+@router.post("/access", status_code=204, dependencies=[Depends(require_access_code)])
+async def access() -> Response:
+    """Check the `X-Access-Code` the login screen was given: 204 when it is right (or none is
+    configured), 401 when it is wrong - so a wrong code never gets past the login screen. Counted
+    in the per-client request budget like every route, so it cannot be guessed at speed."""
+    return Response(status_code=204)
 
 
 @router.get("/health")

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 import json
 from pathlib import Path
 
@@ -649,7 +650,7 @@ def test_a_disputed_name_shows_the_reader_review_proved_best_and_stays_orange(
     proven = ReaderRecord(
         stats=[],
         readers=[
-            ReaderStat(field=FieldKey.first_name, reader="zoom", disputes=10, right=9),
+            ReaderStat(field=FieldKey.first_name, reader="verify", disputes=10, right=9),
             ReaderStat(field=FieldKey.first_name, reader="page", disputes=10, right=2),
         ],
     )
@@ -661,8 +662,8 @@ def test_a_disputed_name_shows_the_reader_review_proved_best_and_stays_orange(
     before, _ = _read_names(raw, settings, storage, imaging, **kwargs)  # type: ignore[arg-type]
     after, _ = _read_names(raw, settings, storage, imaging, learning=proven, **kwargs)  # type: ignore[arg-type]
 
-    assert before.value == "ויקטוריה"
-    assert after.value == "פינחסוביץ"
+    assert before.value == "פינחסוביץ"  # by default the zoomed reading is shown
+    assert after.value == "ישראל"  # the reader review proved best for this field
     assert after.level is ConfidenceLevel.D  # shown first, never confirmed by the record
 
 
@@ -671,7 +672,7 @@ def test_a_reader_with_too_little_evidence_changes_nothing(
 ) -> None:
     thin = ReaderRecord(
         stats=[],
-        readers=[ReaderStat(field=FieldKey.first_name, reader="zoom", disputes=3, right=3)],
+        readers=[ReaderStat(field=FieldKey.first_name, reader="verify", disputes=3, right=3)],
     )
     shown, _ = _read_names(
         raw,
@@ -683,4 +684,150 @@ def test_a_reader_with_too_little_evidence_changes_nothing(
         verify=("ישראל", "ישראלי"),
         zoom=("פינחסוביץ", "גדמון"),
     )
-    assert shown.value == "ויקטוריה"
+    assert shown.value == "פינחסוביץ"  # the default: the zoomed reading
+
+
+def _page_mode(
+    settings: Settings,
+    storage: TmpdirStorage,
+    imaging: CvImaging,
+    vision: Scripted,
+    verify: Scripted,
+    clock: object | None = None,
+) -> VisionServices:
+    """Services with the default whole-page second read (verify_mode="page")."""
+    svc = services(settings, storage, imaging, vision, verify)
+    return VisionServices(**{**svc.__dict__, "settings": settings, "clock": clock or svc.clock})
+
+
+def _date(value: str) -> dict[str, object]:
+    return {"value": value, "source": "handwritten", "box": [700, 100, 740, 300]}
+
+
+@dataclass
+class FixedClock:
+    at: datetime
+
+    def now(self) -> datetime:
+        return self.at
+
+
+def test_the_blind_second_read_is_sent_without_solved_examples(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    vision, verify = Scripted(), Scripted()
+    read_batch_vision([raw], services=_page_mode(settings, storage, imaging, vision, verify))
+
+    assert vision.requests[0].fewshot is True
+    assert [r.fewshot for r in verify.requests] == [False]  # nothing it could copy
+
+
+def test_a_date_without_a_year_takes_the_year_the_page_shows(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    vision = Scripted(page=page_json(receipt_date=_date("30.08.2026")))
+    verify = Scripted(page=page_json(receipt_date=_date("30.8")))
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify)
+    )
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.receipt_date]
+    assert result.value == "30/08/2026"
+    assert result.level is ConfidenceLevel.B  # both readers, the year seen on the page
+
+
+@pytest.mark.parametrize(
+    ("today", "written", "completed"),
+    [
+        (datetime(2026, 10, 25, tzinfo=UTC), "25.8", "25/08/2026"),
+        (datetime(2027, 1, 2, tzinfo=UTC), "28.12", "28/12/2026"),  # last year, not the future
+    ],
+)
+def test_a_date_whose_year_is_nowhere_is_completed_but_stays_orange(
+    raw: PageRaw,
+    settings: Settings,
+    storage: TmpdirStorage,
+    imaging: CvImaging,
+    today: datetime,
+    written: str,
+    completed: str,
+) -> None:
+    vision = Scripted(page=page_json(receipt_date=_date(written)))
+    verify = Scripted(page=page_json(receipt_date=_date(written)))
+    svc = _page_mode(settings, storage, imaging, vision, verify, clock=FixedClock(today))
+    [outcome] = read_batch_vision([raw], services=svc)
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.receipt_date]
+    assert result.value == completed
+    assert result.level is ConfidenceLevel.D
+    assert result.reason == REASON_TEXT["year_inferred"]
+
+
+def test_readers_that_took_a_number_from_different_places_never_close_it(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    here = [{"value": "297456", "source": "screen", "box": [500, 100, 520, 200]}]
+    there = [{"value": "03240", "source": "screen", "box": [800, 600, 820, 700]}]
+    # The zoom reader would re-read the first reader's place and agree with it.
+    vision = Scripted(
+        page=page_json(commitment_number=here),
+        verify={FieldKey.commitment_number: ["297456"]},
+    )
+    verify = Scripted(page=page_json(commitment_number=there))
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify)
+    )
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.commitment_number]
+    assert result.level is ConfidenceLevel.D
+    zoomed = {c.field for r in vision.requests if r.task == "verify" for c in r.crops}
+    assert FieldKey.commitment_number not in zoomed
+
+
+@pytest.mark.parametrize(
+    ("zoomed", "level"),
+    [
+        (["פיקסוביץ"], ConfidenceLevel.D),  # the enlarged name is another word: never green
+        (["פינקלשטיין"], ConfidenceLevel.B),  # the enlarged name confirms the two readers
+        ([], ConfidenceLevel.B),  # nothing read on the crop: no evidence either way
+    ],
+)
+def test_a_handwritten_name_both_readers_agree_on_must_survive_the_zoom(
+    raw: PageRaw,
+    settings: Settings,
+    storage: TmpdirStorage,
+    imaging: CvImaging,
+    zoomed: list[str],
+    level: ConfidenceLevel,
+) -> None:
+    family = {"value": "פינקלשטיין", "source": "handwritten", "box": [100, 320, 140, 500]}
+    vision = Scripted(page=page_json(last_name=family), verify={FieldKey.last_name: zoomed})
+    verify = Scripted(page=page_json(last_name=family))
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify)
+    )
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.last_name]
+    assert result.level is level
+    assert result.value == "פינקלשטיין"  # shown either way, for the technician to confirm
+
+
+def test_a_receipt_date_years_back_is_a_misread_year_and_stays_orange(
+    raw: PageRaw, settings: Settings, storage: TmpdirStorage, imaging: CvImaging
+) -> None:
+    vision = Scripted(page=page_json(receipt_date=_date("26/08/2020")))
+    verify = Scripted(page=page_json(receipt_date=_date("26/08/2020")))
+    clock = FixedClock(datetime(2026, 10, 25, tzinfo=UTC))
+    [outcome] = read_batch_vision(
+        [raw], services=_page_mode(settings, storage, imaging, vision, verify, clock=clock)
+    )
+
+    assert outcome is not None
+    result = outcome.results[FieldKey.receipt_date]
+    assert result.level is ConfidenceLevel.D
+    assert result.reason == REASON_TEXT["date_too_old"]
+    assert result.value == "26/08/2020"  # shown, for the technician to correct the year

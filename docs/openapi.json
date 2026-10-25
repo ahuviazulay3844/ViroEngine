@@ -6,6 +6,21 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/v1/access": {
+      "post": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Access",
+        "description": "Check the `X-Access-Code` the login screen was given: 204 when it is right (or none is\nconfigured), 401 when it is wrong - so a wrong code never gets past the login screen. Counted\nin the per-client request budget like every route, so it cannot be guessed at speed.",
+        "operationId": "access_v1_access_post",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          }
+        }
+      }
+    },
     "/v1/health": {
       "get": {
         "tags": [

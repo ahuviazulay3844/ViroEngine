@@ -96,7 +96,12 @@ THE SEVEN FIELDS
      ("שם משפחה ושם פרטי", "שם ומשפחה" = first then family) is split by that order. A bare "שם",
      "מטופל:" or a sticker line: use your knowledge of which Hebrew / Arabic words are given names
      and which are family names (e.g. "משה", "נועה", "מוחמד" are given names, "כהן", "לוי", "חורי" family names);
-     Israeli hospital stickers and computer screens print the FAMILY name first. If it is still
+     Israeli hospital stickers and computer screens PRINT the FAMILY name first - that applies to
+     printed text only. A HANDWRITTEN name (pen, usually beside the handwritten ID) is written by
+     the lab first name first: Hebrew runs right to left, so in a HEBREW handwritten name the
+     RIGHTMOST word is the first name and the word to its LEFT is the family name (every solved
+     example is written so). A name in Latin letters runs left to right: its LEFTMOST word is the
+     first name. On a rotated page, decide right and left with the page turned upright. If it is still
      unclear, put the whole name in last_name, leave first_name "" and say so in "ambiguities".
   5. first_name never comes from a family-name label and last_name never from a first-name
      label. Copy Hebrew letters exactly as written; keep final letters. No digits, ever.

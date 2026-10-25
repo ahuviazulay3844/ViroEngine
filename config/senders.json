@@ -184,7 +184,9 @@
         "המרכז הרפואי שמיר",
         "asaf harofe",
         "shamir",
-        "שמיר (אסף הרופא)"
+        "שמיר (אסף הרופא)",
+        "המרכז הרפואי שמיר - אסף הרופא",
+        "שמיר אסף הרופא"
       ],
       "keywords": [
         "שמיר",
@@ -214,7 +216,8 @@
         "רמבם",
         "רמב\"ם",
         "rambam",
-        "הקריה הרפואית לבריאות האדם"
+        "הקריה הרפואית לבריאות האדם",
+        "רמב\"ם - הקריה הרפואית לבריאות האדם"
       ],
       "keywords": [
         "רמב\"ם",
@@ -243,7 +246,9 @@
       "source": "seed",
       "aliases": [
         "לניאדו",
-        "laniado"
+        "laniado",
+        "לניאדו - מרכז רפואי צאנז",
+        "מרכז רפואי צאנז"
       ],
       "keywords": [
         "לניאדו"
@@ -270,7 +275,8 @@
       "aliases": [
         "וולפסון",
         "אדית וולפסון",
-        "wolfson"
+        "wolfson",
+        "המרכז הרפואי ע\"ש אדית וולפסון"
       ],
       "keywords": [
         "וולפסון",
@@ -298,7 +304,8 @@
       "aliases": [
         "קפלן",
         "kaplan",
-        "המרכז הרפואי קפלן"
+        "המרכז הרפואי קפלן",
+        "מרכז רפואי קפלן"
       ],
       "keywords": [
         "קפלן"
@@ -386,7 +393,8 @@
         "בני ציון",
         "bnei zion",
         "המרכז הרפואי בני ציון",
-        "רוטשילד בני ציון"
+        "רוטשילד בני ציון",
+        "מרכז רפואי בני ציון"
       ],
       "keywords": [
         "בני ציון"
@@ -414,7 +422,8 @@
       "aliases": [
         "שניידר",
         "schneider",
-        "המרכז הרפואי שניידר לילדים"
+        "המרכז הרפואי שניידר לילדים",
+        "מרכז שניידר לרפואת ילדים בישראל"
       ],
       "keywords": [
         "שניידר"
@@ -441,12 +450,10 @@
       "source": "seed",
       "aliases": [
         "אסותא אשדוד",
-        "אסותא",
         "assuta ashdod",
-        "assuta"
+        "בית החולים האוניברסיטאי אסותא אשדוד"
       ],
       "keywords": [
-        "אסותא",
         "אסותא אשדוד"
       ],
       "commitment_labels": [
@@ -472,7 +479,8 @@
       "aliases": [
         "ברזילי",
         "barzilai",
-        "המרכז הרפואי ברזילי"
+        "המרכז הרפואי ברזילי",
+        "מרכז רפואי ברזילי"
       ],
       "keywords": [
         "ברזילי"
@@ -662,7 +670,8 @@
       "aliases": [
         "הדסה עין כרם",
         "hadassah ein kerem",
-        "הדסה"
+        "הדסה",
+        "מרכז רפואי הדסה - בית החולים עין כרם"
       ],
       "keywords": [
         "הדסה עין כרם"
@@ -688,7 +697,8 @@
       "aliases": [
         "הדסה הר הצופים",
         "hadassah mount scopus",
-        "הדסה"
+        "הדסה",
+        "מרכז רפואי הדסה - בית החולים הר הצופים"
       ],
       "keywords": [
         "הדסה הר הצופים"
@@ -714,7 +724,8 @@
       "aliases": [
         "סורוקה",
         "soroka",
-        "המרכז הרפואי סורוקה"
+        "המרכז הרפואי סורוקה",
+        "המרכז הרפואי האוניברסיטאי סורוקה"
       ],
       "keywords": [
         "סורוקה"
@@ -741,7 +752,8 @@
         "איכילוב",
         "ichilov",
         "סוראסקי",
-        "המרכז הרפואי תל אביב"
+        "המרכז הרפואי תל אביב",
+        "המרכז הרפואי תל אביב ע\"ש סוראסקי"
       ],
       "keywords": [
         "איכילוב",
@@ -771,7 +783,9 @@
         "בילינסון",
         "בלינסון",
         "השרון",
-        "beilinson"
+        "beilinson",
+        "מרכז רפואי רבין - קמפוס בילינסון",
+        "קמפוס בילינסון"
       ],
       "keywords": [
         "רבין",
@@ -797,7 +811,9 @@
       "source": "seed",
       "aliases": [
         "פוריה",
-        "poriya"
+        "poriya",
+        "המרכז הרפואי צפון - פוריה",
+        "המרכז הרפואי צפון"
       ],
       "keywords": [
         "פוריה"
@@ -849,7 +865,8 @@
       "aliases": [
         "העמק",
         "emek",
-        "המרכז הרפואי העמק"
+        "המרכז הרפואי העמק",
+        "מרכז רפואי העמק"
       ],
       "keywords": [
         "העמק"
@@ -876,7 +893,8 @@
         "הגליל המערבי",
         "גליל מערבי",
         "נהריה",
-        "galilee medical center"
+        "galilee medical center",
+        "המרכז הרפואי לגליל"
       ],
       "keywords": [
         "הגליל המערבי",
@@ -902,7 +920,8 @@
       "source": "seed",
       "aliases": [
         "יוספטל",
-        "yoseftal"
+        "yoseftal",
+        "המרכז הרפואי יוספטל"
       ],
       "keywords": [
         "יוספטל"
@@ -927,7 +946,8 @@
       "source": "seed",
       "aliases": [
         "מעיני הישועה",
-        "maayanei hayeshua"
+        "maayanei hayeshua",
+        "מרכז רפואי מעיני הישועה"
       ],
       "keywords": [
         "מעיני הישועה"
@@ -952,7 +972,8 @@
       "source": "seed",
       "aliases": [
         "אסותא רמת החייל",
-        "assuta ramat hahayal"
+        "assuta ramat hahayal",
+        "בית החולים אסותא רמת החייל"
       ],
       "keywords": [
         "אסותא רמת החייל"
@@ -1002,7 +1023,8 @@
       "source": "seed",
       "aliases": [
         "אלישע",
-        "elisha"
+        "elisha",
+        "בית החולים אלישע"
       ],
       "keywords": [
         "אלישע"
@@ -1070,6 +1092,450 @@
         "מס' קליטה",
         "מספר מבחנה"
       ],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "רבין - השרון",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "מרכז רפואי רבין - קמפוס גולדה השרון",
+        "גולדה השרון",
+        "בית החולים השרון",
+        "קמפוס גולדה"
+      ],
+      "keywords": [
+        "רבין - השרון"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אוגוסטה ויקטוריה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים אוגוסטה ויקטוריה",
+        "אוגוסטה ויקטוריה",
+        "augusta victoria"
+      ],
+      "keywords": [
+        "אוגוסטה ויקטוריה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "סנט ג'וזף",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים סנט ג'וזף",
+        "סנט ג'וזף",
+        "st joseph"
+      ],
+      "keywords": [
+        "סנט ג'וזף"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אל-מקאסד",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים אל-מקאסד",
+        "אל-מקאסד",
+        "מקאסד",
+        "makassed"
+      ],
+      "keywords": [
+        "אל-מקאסד"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "האיטלקי חיפה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים האיטלקי (חיפה)",
+        "האיטלקי חיפה"
+      ],
+      "keywords": [
+        "האיטלקי חיפה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "נצרת האנגלי",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים נצרת (האנגלי)",
+        "בית החולים נצרת",
+        "האנגלי נצרת",
+        "EMMS"
+      ],
+      "keywords": [
+        "נצרת האנגלי"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "המשפחה הקדושה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים המשפחה הקדושה (האיטלקי)",
+        "בית החולים המשפחה הקדושה",
+        "המשפחה הקדושה",
+        "holy family"
+      ],
+      "keywords": [
+        "המשפחה הקדושה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "סן ונסן דה פול",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים סן ונסן דה פול (הצרפתי)",
+        "סן ונסן דה פול",
+        "הצרפתי נצרת"
+      ],
+      "keywords": [
+        "סן ונסן דה פול"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא חיפה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים אסותא חיפה",
+        "אסותא חיפה",
+        "assuta haifa"
+      ],
+      "keywords": [
+        "אסותא חיפה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא ראשון לציון",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים אסותא ראשון לציון",
+        "אסותא ראשון לציון",
+        "assuta rishon"
+      ],
+      "keywords": [
+        "אסותא ראשון לציון"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא באר שבע",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים אסותא באר שבע",
+        "אסותא באר שבע",
+        "assuta beer sheva"
+      ],
+      "keywords": [
+        "אסותא באר שבע"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא ירושלים",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי אסותא ירושלים",
+        "אסותא ירושלים",
+        "assuta jerusalem"
+      ],
+      "keywords": [
+        "אסותא ירושלים"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא השלום",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי אסותא השלום-תל אביב",
+        "אסותא השלום",
+        "assuta hashalom"
+      ],
+      "keywords": [
+        "אסותא השלום"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא כלניות",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי אסותא אשדוד-כלניות",
+        "אסותא כלניות"
+      ],
+      "keywords": [
+        "אסותא כלניות"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "אסותא רעננה",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "המרכז הרפואי אסותא רעננה",
+        "אסותא רעננה",
+        "assuta raanana"
+      ],
+      "keywords": [
+        "אסותא רעננה"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "רפאל",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "בית החולים רפאל",
+        "רפאל",
+        "raphael"
+      ],
+      "keywords": [
+        "רפאל"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
+      "barcode_is_commitment": null
+    },
+    {
+      "canonical": "משגב לדך",
+      "family": "hospital",
+      "source": "seed",
+      "aliases": [
+        "משגב לדך",
+        "בית החולים משגב לדך",
+        "misgav ladach"
+      ],
+      "keywords": [
+        "משגב לדך"
+      ],
+      "commitment_labels": [
+        "מספר התחייבות",
+        "התחייבות"
+      ],
+      "notes": "From the lab's hospital list (2026-10-25); grammar not yet observed; generic labels.",
+      "commitment_deny": [
+        "מקרה",
+        "מס' ביקור",
+        "מס' קליטה",
+        "מספר מבחנה"
+      ],
+      "pattern_hints": [],
       "barcode_is_commitment": null
     }
   ]

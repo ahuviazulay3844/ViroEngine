@@ -432,6 +432,7 @@ export interface VisionRequest {
   barcode_candidates?: string[];
   prompt_version: string;
   response_schema?: Record<string, unknown>;
+  fewshot?: boolean;
 }
 
 /** Schema-validated provider response. The model never assigns its own confidence. `answers` carries the S9 extraction per requested field; `raw_text`/`candidates` carry the S5 sender answer. `failovers` lists "from->to" hops that happened before this answer; `cache_hit` is True when it came from the local cache and no provider was called. */

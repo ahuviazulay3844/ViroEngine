@@ -97,13 +97,18 @@ export function createHttpClient(options: HttpClientOptions): ApiClient {
   }
 
   return {
-    // The API has no login route: the access code is checked on upload (401/403 there).
-    // Here we only remember it for the session.
-    login(code) {
+    // The server checks the code (POST /access) before the app moves on: a wrong code is
+    // refused here, not only later at upload. Only a code the server accepted is remembered.
+    async login(code) {
       const trimmed = code.trim();
-      if (trimmed === '') return Promise.resolve({ ok: false });
+      if (trimmed === '') return { ok: false };
+      const response = await doFetch(`${baseUrl}/access`, {
+        method: 'POST',
+        headers: { ...keyHeader, 'X-Access-Code': trimmed },
+      });
+      if (!response.ok) return { ok: false };
       sessionStorage.setItem(ACCESS_CODE_KEY, trimmed);
-      return Promise.resolve({ ok: true });
+      return { ok: true };
     },
 uploadSingle(file, idempotencyKey) {
       const body = new FormData();

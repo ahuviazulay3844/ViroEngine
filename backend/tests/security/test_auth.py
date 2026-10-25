@@ -63,6 +63,17 @@ def test_requires_access_code(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -
     assert (missing.status_code, batch.status_code, read.status_code) == (401, 401, 200)
 
 
+def test_the_login_check_refuses_a_wrong_access_code(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    with running_app(monkeypatch, tmp_path, APP_ACCESS_CODE=ACCESS_CODE) as h:
+        right = h.client.post("/v1/access", headers={**HEADERS, "X-Access-Code": ACCESS_CODE})
+        wrong = h.client.post("/v1/access", headers={**HEADERS, "X-Access-Code": "nope"})
+        missing = h.client.post("/v1/access", headers=HEADERS)
+
+    assert (right.status_code, wrong.status_code, missing.status_code) == (204, 401, 401)
+
+
 def test_health_needs_no_credentials(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     with running_app(monkeypatch, tmp_path, APP_ACCESS_CODE=ACCESS_CODE) as h:
         assert h.client.get("/v1/health").status_code == 200

@@ -23,12 +23,15 @@ from __future__ import annotations
 from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
+from datetime import date
+import re
 import time
 from typing import Final, cast, get_args
 
 import structlog
 
 from backend.core.errors import ProviderExhausted, SafeLineError
+from backend.core.geometry import iou
 from backend.core.given_names import is_given_name
 from backend.core.learning import NAME_FIELDS, reader_role, with_learned
 from backend.core.models import (
@@ -741,8 +744,27 @@ _ARBITRATED: Final = frozenset({"readers_disagree", "failed_id_check", "multiple
 _ARBITER_MARGIN: Final = 0.6
 
 
+# Structural: numbers whose two readers can point at different printed numbers on the page.
+_NUMBER_FIELDS: Final = frozenset(
+    {FieldKey.national_id, FieldKey.central_number, FieldKey.commitment_number}
+)
+
+
+def _read_elsewhere(result: FieldResult) -> bool:
+    """True when the page reader and the blind reader took a disputed number from different places
+    on the page. A zoomed crop is cut around the first reader's place, so it can only re-read that
+    number - it cannot tell which of two different numbers is the right one, and its agreement
+    would turn a wrong choice green. Unknown places are not treated as different."""
+    first = [c.box for c in result.candidates if reader_role(c) == "page" and c.box is not None]
+    second = [c.box for c in result.candidates if reader_role(c) == "verify" and c.box is not None]
+    if not first or not second:
+        return False
+    return all(iou(a, b) == 0.0 for a in first for b in second)
+
+
 def _disputed(evaluations: dict[FieldKey, FieldEvaluation]) -> list[FieldKey]:
-    """Fields worth a third reading: level D for an arbitrable reason, with a located value."""
+    """Fields worth a third reading: level D for an arbitrable reason, with a located value. Two
+    readers that read a number in different places stay flagged instead (`_read_elsewhere`)."""
     reasons = {REASON_TEXT[code] for code in _ARBITRATED}
     return [
         key
@@ -751,7 +773,114 @@ def _disputed(evaluations: dict[FieldKey, FieldEvaluation]) -> list[FieldKey]:
         and ev.result.level is ConfidenceLevel.D
         and ev.result.reason in reasons
         and any(c.box is not None for c in ev.result.candidates)
+        and not (
+            key in _NUMBER_FIELDS
+            and ev.result.reason == REASON_TEXT["readers_disagree"]
+            and _read_elsewhere(ev.result)
+        )
     ]
+
+
+def _names_to_zoom(evaluations: dict[FieldKey, FieldEvaluation]) -> list[FieldKey]:
+    """Handwritten names the two whole-page readers agreed on. Both readers see the same reduced
+    page, so on small cursive they can invent the same familiar name (part 3: "פינקלשטיין" for a
+    handwritten "פיקסוביץ"); a zoomed read of the name must not contradict them (`_zoom_veto`)."""
+    return [
+        key
+        for key in NAME_FIELDS
+        if evaluations[key].result.level in (ConfidenceLevel.A, ConfidenceLevel.B)
+        and evaluations[key].result.source is SourceKind.handwritten
+        and any(c.box is not None for c in evaluations[key].result.candidates)
+    ]
+
+
+def _zoom_veto(evaluations: dict[FieldKey, FieldEvaluation], keys: Sequence[FieldKey]) -> None:
+    """A name the zoomed reader read as a different word goes to level D `readers_disagree`,
+    still showing the agreed reading. A zoomed read that returned nothing, or the OTHER name (the
+    crop holds both words), neither confirms nor contradicts. In place."""
+    agreed = {k: normalize_name(evaluations[k].result.value or "") or "" for k in NAME_FIELDS}
+    for key in keys:
+        ev = evaluations[key]
+        zoom_words = [
+            word
+            for c in ev.result.candidates
+            if reader_role(c) == "zoom"
+            for word in (normalize_name(c.value) or "").split()
+        ]
+        if not zoom_words or not agreed[key]:
+            continue
+        near = [w for w in zoom_words if _edit_distance(w, agreed[key]) <= 1]
+        other = [w for k, v in agreed.items() if k is not key and v for w in zoom_words if w == v]
+        if near or len(other) == len(zoom_words):
+            continue
+        flagged = flag_for_review(ev, "readers_disagree")
+        shown = flagged.result.model_copy(
+            update={"value": ev.result.value, "display_value": ev.result.value}
+        )
+        evaluations[key] = FieldEvaluation(result=shown, signals=flagged.signals, evidence=None)
+
+
+# A handwritten receipt date beside the central number often has no year ("25.8").
+_DAY_MONTH: Final = re.compile(r"^\s*(\d{1,2})\s*[./-]\s*(\d{1,2})\s*[./-]?\s*$")
+YEAR_INFERRED_NOTE: Final = "year_inferred"
+
+
+def _complete_years(page: _Page, services: VisionServices) -> None:
+    """Give a receipt date read without a year its year, so it is not rejected as no date at all.
+    The year comes from the page when a reader read the same day and month with a year; otherwise
+    it is the latest year that does not put the date in the future (a "28.12" read on 2 January
+    is last December), and the reading carries YEAR_INFERRED_NOTE: it is never shown as verified
+    (`_flag_inferred_year`). In place; a reading that already has a year is left alone."""
+    cands = page.reads.get(FieldKey.receipt_date, [])
+    dated = [d for d in (parse_il_date(c.value) for c in cands) if d is not None]
+    today = services.clock.now().date()
+    completed: list[Candidate] = []
+    for cand in cands:
+        m = _DAY_MONTH.match(cand.value)
+        if m is None:
+            completed.append(cand)
+            continue
+        day, month = int(m[1]), int(m[2])
+        notes = list(cand.notes)
+        year = next((d.year for d in dated if (d.day, d.month) == (day, month)), None)
+        try:
+            if year is None:
+                notes.append(YEAR_INFERRED_NOTE)
+                year = today.year if date(today.year, month, day) <= today else today.year - 1
+            date(year, month, day)
+        except ValueError:  # 31.4 and the like: no year makes it a date
+            completed.append(cand)
+            continue
+        value = f"{day:02d}/{month:02d}/{year}"
+        completed.append(cand.model_copy(update={"value": value, "notes": notes}))
+    page.reads[FieldKey.receipt_date] = completed
+
+
+# Structural: a sample reaches the lab within days; a receipt date older than this is a misread
+# year ("26.8.26" read as 2020), not an old sample.
+_MAX_RECEIPT_AGE_DAYS: Final = 365
+
+
+def _flag_old_date(evaluations: dict[FieldKey, FieldEvaluation], today: date) -> None:
+    """A receipt date more than a year before today stays orange, showing what was read. In place."""
+    ev = evaluations[FieldKey.receipt_date]
+    read = parse_il_date(ev.result.value or "")
+    if read is None or ev.result.level is ConfidenceLevel.D:
+        return
+    if (today - read).days > _MAX_RECEIPT_AGE_DAYS:
+        evaluations[FieldKey.receipt_date] = flag_for_review(ev, "date_too_old")
+
+
+def _flag_inferred_year(evaluations: dict[FieldKey, FieldEvaluation]) -> None:
+    """A receipt date whose year no reader saw on the page stays orange, showing the completed
+    date for the technician to confirm. In place."""
+    ev = evaluations[FieldKey.receipt_date]
+    shown = parse_il_date(ev.result.value or "")
+    if shown is None or ev.result.level is ConfidenceLevel.D:
+        return
+    support = [c for c in ev.result.candidates if parse_il_date(c.value) == shown]
+    if support and all(YEAR_INFERRED_NOTE in c.notes for c in support):
+        evaluations[FieldKey.receipt_date] = flag_for_review(ev, "year_inferred")
 
 
 def _arbitrate(page: _Page, keys: Sequence[FieldKey], services: VisionServices) -> None:
@@ -823,20 +952,29 @@ def _outcome(
     """S8 over everything read for the page, and the page's outcome."""
     t_score = time.perf_counter()
     sender_values = [c.value for c in page.reads.get(FieldKey.sender, [])]
+    _complete_years(page, services)
     evaluations = _evaluate_all(page, services)
     disputed = _disputed(evaluations)
-    if disputed:
-        _arbitrate(page, disputed, services)
+    zoomed_names = _names_to_zoom(evaluations)
+    if disputed or zoomed_names:
+        _arbitrate(page, [*disputed, *zoomed_names], services)
+        _complete_years(page, services)
         evaluations = _evaluate_all(page, services)
     for key in FieldKey:
         evaluations[key] = _settle(key, evaluations[key])
+    _flag_inferred_year(evaluations)
+    _flag_old_date(evaluations, services.clock.now().date())
     _resolve_swapped_names(evaluations, page)
+    _zoom_veto(evaluations, zoomed_names)  # after the reordering, which would reset its level
     _flag_shared_numbers(evaluations)
     _flag_twin_names(evaluations)
     _flag_unlabelled_names(evaluations, page)
     _distrust(evaluations, evaluations[FieldKey.sender].result.value, services)
     for key in _SHOWN_WHEN_DISPUTED:
-        evaluations[key] = _show_first_reading(evaluations[key], _trusted_reader(key, services))
+        # The zoomed reader sees the name enlarged: on a dispute its reading is the one shown
+        # (still orange), unless review has proven another reader better for this field.
+        prefer = _trusted_reader(key, services) or "zoom"
+        evaluations[key] = _show_first_reading(evaluations[key], prefer)
     answer = page.answer
     role = answer.page_role if answer is not None else "primary_form"
     # A SAP screen or a lab report that the model read is a sample of its own (the 48 samples
@@ -973,6 +1111,7 @@ def _second_page_read(page: _Page, services: VisionServices) -> VisionResponse |
         barcode_candidates=list(dict.fromkeys(h.payload for h in page.hits))[:_MAX_BARCODES],
         prompt_version=services.prompt_version,
         response_schema=page_schema(options),
+        fewshot=False,
     )
     try:
         second = services.verify.extract(request)

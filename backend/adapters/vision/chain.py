@@ -269,8 +269,10 @@ class VisionChainAdapter:
         return base * (1.0 + retry.jitter_factor * (2.0 * self._rand() - 1.0))
 
     def _examples(self, request: VisionRequest) -> ExampleSet:
-        """The solved examples for a page read (re-read only when examples.json changes)."""
-        return load_examples(self._fewshot_dir if request.task == "page" else None)
+        """The solved examples for a page read (re-read only when examples.json changes). None
+        for the blind second read, which must not see values it could copy."""
+        shown = request.task == "page" and request.fewshot
+        return load_examples(self._fewshot_dir if shown else None)
 
     def _ask(
         self, slot: _Slot, request: VisionRequest, examples: ExampleSet
