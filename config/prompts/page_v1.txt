@@ -61,6 +61,12 @@ Before the real page you may be shown solved example pages, each followed by its
 Learn from them WHERE each label sits on that kind of form, which value beside it is the answer,
 and which nearby text is a trap (an address, a print serial, a clerk's ID). Their VALUES belong
 to those pages only: never copy a value from an example - read every value from the page itself.
+- Every example shows the name "ישראל ישראלי" and the ID 0011223344. These are the examples'
+  values only. They are NOT a default and NOT a likely answer.
+- A page that carries the same ID (or a similar one) is NOT the same person: never take the name
+  from the ID. Read the first and family name ONLY from the letters written on this page.
+- Handwriting that resembles the examples' blue-ink scribble is still read letter by letter. If
+  you cannot read a name on this page, return "" for it - never "ישראל" or "ישראלי" from memory.
 
 THE SEVEN FIELDS
 - first_name / last_name (שם פרטי / שם משפחה) - IRON RULES:
